@@ -1,0 +1,5 @@
+{
+  "name": "PayFlow - Cash Payment Requests",
+  "description": "A streamlined cash payment request system with multi-level approval workflows, Gemini-powered summaries, and analytics.",
+  "requestFramePermissions": []
+}

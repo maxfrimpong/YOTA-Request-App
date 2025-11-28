@@ -1,0 +1,65 @@
+export enum Role {
+  ADMIN = 'ADMIN',
+  STAFF = 'STAFF',
+  AUTHORIZER = 'AUTHORIZER',
+  APPROVER = 'APPROVER' // Executive Director
+}
+
+export enum RequestStatus {
+  PENDING_AUTHORIZATION = 'Pending Authorization',
+  AUTHORIZED = 'Authorized',
+  FROZEN = 'Frozen',
+  REJECTED_BY_AUTHORIZER = 'Rejected (Auth)',
+  APPROVED = 'Approved',
+  REJECTED_BY_APPROVER = 'Rejected (ED)'
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  password?: string;
+  roles: Role[]; // Changed from single role to array
+  department: string;
+  position?: string;
+}
+
+export interface RequestFile {
+  name: string;
+  type: 'memo' | 'invoice' | 'other';
+  url: string; // Mock URL
+}
+
+export interface PaymentRequest {
+  id: string;
+  requesterId: string;
+  requesterName: string;
+  department: string;
+  position: string;
+  vendorName: string;
+  paymentDetails: string;
+  amount: number;
+  currency: 'GHS' | 'USD' | 'EUR' | 'GBP';
+  description: string;
+  files: RequestFile[];
+  authorizerId: string;
+  status: RequestStatus;
+  createdAt: string;
+  updatedAt: string;
+  remarks?: string; // For rejection/freezing notes
+  signOff: string; // Requester's name signature
+}
+
+export interface AuthContextType {
+  user: User | null;
+  activeRole: Role | null; // The currently selected role for the session
+  users: User[];
+  requests: PaymentRequest[];
+  login: (email: string, password: string) => boolean;
+  logout: () => void;
+  switchRole: (role: Role) => void;
+  addRequest: (req: Omit<PaymentRequest, 'id' | 'createdAt' | 'updatedAt' | 'status'>) => void;
+  updateRequestStatus: (id: string, status: RequestStatus, remarks?: string) => void;
+  addUser: (userData: Omit<User, 'id'>) => void;
+  editUser: (id: string, userData: Partial<User>) => void;
+}
