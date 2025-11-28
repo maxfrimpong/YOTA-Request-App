@@ -7,6 +7,7 @@ import { StaffDashboard } from './pages/StaffDashboard';
 import { AuthorizerDashboard } from './pages/AuthorizerDashboard';
 import { ApproverDashboard } from './pages/ApproverDashboard';
 import { AdminDashboard } from './pages/AdminDashboard';
+import { Profile } from './pages/Profile';
 import { Role } from './types';
 
 const DashboardRouter = () => {
@@ -47,6 +48,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <DashboardRouter />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
           />

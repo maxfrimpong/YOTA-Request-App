@@ -50,11 +50,31 @@ export interface PaymentRequest {
   signOff: string; // Requester's name signature
 }
 
+export interface Notification {
+  id: string;
+  userId: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+  type: 'info' | 'success' | 'error' | 'warning';
+}
+
+export interface ChatMessage {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  content: string;
+  timestamp: string;
+  isRead: boolean;
+}
+
 export interface AuthContextType {
   user: User | null;
   activeRole: Role | null; // The currently selected role for the session
   users: User[];
   requests: PaymentRequest[];
+  notifications: Notification[];
+  messages: ChatMessage[];
   login: (email: string, password: string) => boolean;
   logout: () => void;
   switchRole: (role: Role) => void;
@@ -62,4 +82,8 @@ export interface AuthContextType {
   updateRequestStatus: (id: string, status: RequestStatus, remarks?: string) => void;
   addUser: (userData: Omit<User, 'id'>) => void;
   editUser: (id: string, userData: Partial<User>) => void;
+  markAsRead: (id: string) => void;
+  markAllAsRead: () => void;
+  sendMessage: (receiverId: string, content: string) => void;
+  markChatAsRead: (senderId: string) => void;
 }

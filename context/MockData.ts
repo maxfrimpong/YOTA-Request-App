@@ -1,4 +1,4 @@
-import { Role, User, PaymentRequest, RequestStatus } from "../types";
+import { Role, User, PaymentRequest, RequestStatus, ChatMessage } from "../types";
 
 export const MOCK_USERS: User[] = [
   { id: 'u1', name: 'Alice Staff', email: 'alice@org.com', password: 'password123', roles: [Role.STAFF], department: 'Marketing', position: 'Coordinator' },
@@ -63,5 +63,32 @@ export const MOCK_REQUESTS: PaymentRequest[] = [
     createdAt: new Date(Date.now() - 86400000 * 10).toISOString(),
     updatedAt: new Date(Date.now() - 86400000 * 8).toISOString(),
     signOff: 'Alice Staff'
+  }
+];
+
+export const MOCK_MESSAGES: ChatMessage[] = [
+  {
+    id: 'm1',
+    senderId: 'u3', // Charlie
+    receiverId: 'u1', // Alice
+    content: 'Hi Alice, regarding your print request, is the amount final?',
+    timestamp: new Date(Date.now() - 86400000).toISOString(),
+    isRead: true
+  },
+  {
+    id: 'm2',
+    senderId: 'u1', // Alice
+    receiverId: 'u3', // Charlie
+    content: 'Yes, I got the final quote yesterday.',
+    timestamp: new Date(Date.now() - 86300000).toISOString(),
+    isRead: true
+  },
+  {
+    id: 'm3',
+    senderId: 'u3', // Charlie
+    receiverId: 'u1', // Alice
+    content: 'Okay, I will review it shortly.',
+    timestamp: new Date(Date.now() - 86200000).toISOString(),
+    isRead: false
   }
 ];
