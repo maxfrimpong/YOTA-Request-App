@@ -391,222 +391,224 @@ export const StaffDashboard = () => {
         </div>
       )}
 
-      {/* New/Edit Request Modal */}
+      {/* New/Edit Request Modal - Updated Structure for scroll fix */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl">
-            <div className="flex justify-between items-center p-6 border-b">
-              <h3 className="text-xl font-bold text-gray-900">{editingRequestId ? 'Edit Request' : 'New Cash Payment Request'}</h3>
-              <button onClick={() => setIsFormOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <XCircle size={24} />
-              </button>
-            </div>
-            
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Vendor Name</label>
-                  <input required type="text" className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
-                    value={vendor} onChange={e => setVendor(e.target.value)} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Amount</label>
-                  <div className="flex mt-1">
-                    <select 
-                        className="block rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal sm:text-sm"
-                        value={currency}
-                        onChange={(e) => setCurrency(e.target.value as any)}
-                    >
-                        <option value="GHS">GHS</option>
-                        <option value="USD">USD</option>
-                        <option value="EUR">EUR</option>
-                        <option value="GBP">GBP</option>
-                    </select>
-                    <input required type="number" step="0.01" className="block w-full rounded-r-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
-                        value={amount} onChange={e => setAmount(e.target.value)} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Structured Payment Details */}
-              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center">
-                    <CreditCard size={16} className="mr-2" /> Payment Details
-                </h4>
-                
-                <div className="mb-4">
-                    <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Payment Method</label>
-                    <div className="flex space-x-4">
-                        <label className={`flex items-center space-x-2 cursor-pointer p-2 rounded border ${paymentMethod === 'Mobile Money' ? 'bg-white border-brand-teal ring-1 ring-brand-teal' : 'border-gray-300 hover:bg-white'}`}>
-                            <input 
-                                type="radio" 
-                                name="paymentMethod" 
-                                className="text-brand-teal focus:ring-brand-teal"
-                                checked={paymentMethod === 'Mobile Money'}
-                                onChange={() => setPaymentMethod('Mobile Money')}
-                            />
-                            <div className="flex items-center">
-                                <Smartphone size={16} className="mr-2 text-gray-600"/>
-                                <span className="text-sm font-medium">Mobile Money</span>
-                            </div>
-                        </label>
-                        <label className={`flex items-center space-x-2 cursor-pointer p-2 rounded border ${paymentMethod === 'Bank Account' ? 'bg-white border-brand-teal ring-1 ring-brand-teal' : 'border-gray-300 hover:bg-white'}`}>
-                            <input 
-                                type="radio" 
-                                name="paymentMethod" 
-                                className="text-brand-teal focus:ring-brand-teal"
-                                checked={paymentMethod === 'Bank Account'}
-                                onChange={() => setPaymentMethod('Bank Account')}
-                            />
-                            <div className="flex items-center">
-                                <Landmark size={16} className="mr-2 text-gray-600"/>
-                                <span className="text-sm font-medium">Bank Account</span>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                {paymentMethod === 'Mobile Money' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Network Operator</label>
-                            <select 
-                                required 
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal sm:text-sm"
-                                value={momoOperator}
-                                onChange={(e) => setMomoOperator(e.target.value)}
-                            >
-                                <option value="MTN Momo">MTN Momo</option>
-                                <option value="Telecel Cash">Telecel Cash</option>
-                                <option value="AT Cash">AT Cash</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Mobile Number</label>
-                            <input 
-                                required 
-                                type="text" 
-                                placeholder="024xxxxxxx"
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
-                                value={momoNumber}
-                                onChange={(e) => setMomoNumber(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700">Bank Name</label>
-                            <input 
-                                required 
-                                type="text" 
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
-                                value={bankName}
-                                onChange={(e) => setBankName(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Account Name</label>
-                            <input 
-                                required 
-                                type="text" 
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
-                                value={accName}
-                                onChange={(e) => setAccName(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Account Number</label>
-                            <input 
-                                required 
-                                type="text" 
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
-                                value={accNumber}
-                                onChange={(e) => setAccNumber(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Branch Name</label>
-                            <input 
-                                required 
-                                type="text" 
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
-                                value={branchName}
-                                onChange={(e) => setBranchName(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Sort/IBAN/Branch Code</label>
-                            <input 
-                                required 
-                                type="text" 
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
-                                value={sortCode}
-                                onChange={(e) => setSortCode(e.target.value)}
-                            />
-                        </div>
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700">SWIFT Code</label>
-                            <input 
-                                required 
-                                type="text" 
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
-                                value={swift}
-                                onChange={(e) => setSwift(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Description / Memo Content</label>
-                <textarea required rows={4} className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
-                  placeholder="Explain the purpose of this payment..."
-                  value={description} onChange={e => setDescription(e.target.value)} />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer"
-                      onClick={() => memoInputRef.current?.click()}>
-                    <input type="file" ref={memoInputRef} className="hidden" accept=".pdf,.doc,.docx" onChange={(e) => handleFileChange(e, 'memo')} />
-                    <Upload className="mx-auto h-8 w-8 text-gray-400" />
-                    <span className="mt-2 block text-sm font-medium text-gray-600">Upload Memo (PDF/Doc)</span>
-                    {files.filter(f => f.type === 'memo').length > 0 && <span className="text-xs text-brand-teal mt-1">File Selected</span>}
-                 </div>
-                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer"
-                      onClick={() => invoiceInputRef.current?.click()}>
-                    <input type="file" ref={invoiceInputRef} className="hidden" accept="image/*,.pdf" onChange={(e) => handleFileChange(e, 'invoice')} />
-                    <Upload className="mx-auto h-8 w-8 text-gray-400" />
-                    <span className="mt-2 block text-sm font-medium text-gray-600">Upload Invoice</span>
-                    {files.filter(f => f.type === 'invoice').length > 0 && <span className="text-xs text-brand-teal mt-1">File Selected</span>}
-                 </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Select Authorizer</label>
-                    <select required className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
-                        value={selectedAuthorizer} onChange={e => setSelectedAuthorizer(e.target.value)}>
-                        <option value="">-- Select --</option>
-                        {authorizers.map(a => <option key={a.id} value={a.id}>{a.name} ({a.department})</option>)}
-                    </select>
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Digital Sign Off</label>
-                    <input required type="text" placeholder={`Type "${user?.name}" to sign`}
-                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
-                        value={signOff} onChange={e => setSignOff(e.target.value)} />
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-3 pt-4 border-t">
-                <button type="button" onClick={() => setIsFormOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Cancel</button>
-                <button type="submit" disabled={loading} className="px-4 py-2 text-sm font-medium text-white bg-brand-teal rounded-md hover:bg-[#008f7a] disabled:opacity-50">
-                    {loading ? 'Processing...' : (editingRequestId ? 'Update Request' : 'Submit Request')}
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl relative">
+                <div className="flex justify-between items-center p-6 border-b">
+                <h3 className="text-xl font-bold text-gray-900">{editingRequestId ? 'Edit Request' : 'New Cash Payment Request'}</h3>
+                <button onClick={() => setIsFormOpen(false)} className="text-gray-400 hover:text-gray-600">
+                    <XCircle size={24} />
                 </button>
-              </div>
-            </form>
+                </div>
+                
+                <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                    <label className="block text-sm font-medium text-gray-700">Vendor Name</label>
+                    <input required type="text" className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                        value={vendor} onChange={e => setVendor(e.target.value)} />
+                    </div>
+                    <div>
+                    <label className="block text-sm font-medium text-gray-700">Amount</label>
+                    <div className="flex mt-1">
+                        <select 
+                            className="block rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal sm:text-sm"
+                            value={currency}
+                            onChange={(e) => setCurrency(e.target.value as any)}
+                        >
+                            <option value="GHS">GHS</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="GBP">GBP</option>
+                        </select>
+                        <input required type="number" step="0.01" className="block w-full rounded-r-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                            value={amount} onChange={e => setAmount(e.target.value)} />
+                    </div>
+                    </div>
+                </div>
+
+                {/* Structured Payment Details */}
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center">
+                        <CreditCard size={16} className="mr-2" /> Payment Details
+                    </h4>
+                    
+                    <div className="mb-4">
+                        <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Payment Method</label>
+                        <div className="flex space-x-4">
+                            <label className={`flex items-center space-x-2 cursor-pointer p-2 rounded border ${paymentMethod === 'Mobile Money' ? 'bg-white border-brand-teal ring-1 ring-brand-teal' : 'border-gray-300 hover:bg-white'}`}>
+                                <input 
+                                    type="radio" 
+                                    name="paymentMethod" 
+                                    className="text-brand-teal focus:ring-brand-teal"
+                                    checked={paymentMethod === 'Mobile Money'}
+                                    onChange={() => setPaymentMethod('Mobile Money')}
+                                />
+                                <div className="flex items-center">
+                                    <Smartphone size={16} className="mr-2 text-gray-600"/>
+                                    <span className="text-sm font-medium">Mobile Money</span>
+                                </div>
+                            </label>
+                            <label className={`flex items-center space-x-2 cursor-pointer p-2 rounded border ${paymentMethod === 'Bank Account' ? 'bg-white border-brand-teal ring-1 ring-brand-teal' : 'border-gray-300 hover:bg-white'}`}>
+                                <input 
+                                    type="radio" 
+                                    name="paymentMethod" 
+                                    className="text-brand-teal focus:ring-brand-teal"
+                                    checked={paymentMethod === 'Bank Account'}
+                                    onChange={() => setPaymentMethod('Bank Account')}
+                                />
+                                <div className="flex items-center">
+                                    <Landmark size={16} className="mr-2 text-gray-600"/>
+                                    <span className="text-sm font-medium">Bank Account</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    {paymentMethod === 'Mobile Money' ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Network Operator</label>
+                                <select 
+                                    required 
+                                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal sm:text-sm"
+                                    value={momoOperator}
+                                    onChange={(e) => setMomoOperator(e.target.value)}
+                                >
+                                    <option value="MTN Momo">MTN Momo</option>
+                                    <option value="Telecel Cash">Telecel Cash</option>
+                                    <option value="AT Cash">AT Cash</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Mobile Number</label>
+                                <input 
+                                    required 
+                                    type="text" 
+                                    placeholder="024xxxxxxx"
+                                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                    value={momoNumber}
+                                    onChange={(e) => setMomoNumber(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700">Bank Name</label>
+                                <input 
+                                    required 
+                                    type="text" 
+                                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                    value={bankName}
+                                    onChange={(e) => setBankName(e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Account Name</label>
+                                <input 
+                                    required 
+                                    type="text" 
+                                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                    value={accName}
+                                    onChange={(e) => setAccName(e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Account Number</label>
+                                <input 
+                                    required 
+                                    type="text" 
+                                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                    value={accNumber}
+                                    onChange={(e) => setAccNumber(e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Branch Name</label>
+                                <input 
+                                    required 
+                                    type="text" 
+                                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                    value={branchName}
+                                    onChange={(e) => setBranchName(e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Sort/IBAN/Branch Code</label>
+                                <input 
+                                    required 
+                                    type="text" 
+                                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                    value={sortCode}
+                                    onChange={(e) => setSortCode(e.target.value)}
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700">SWIFT Code</label>
+                                <input 
+                                    required 
+                                    type="text" 
+                                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                    value={swift}
+                                    onChange={(e) => setSwift(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Description / Memo Content</label>
+                    <textarea required rows={4} className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                    placeholder="Explain the purpose of this payment..."
+                    value={description} onChange={e => setDescription(e.target.value)} />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer"
+                        onClick={() => memoInputRef.current?.click()}>
+                        <input type="file" ref={memoInputRef} className="hidden" accept=".pdf,.doc,.docx" onChange={(e) => handleFileChange(e, 'memo')} />
+                        <Upload className="mx-auto h-8 w-8 text-gray-400" />
+                        <span className="mt-2 block text-sm font-medium text-gray-600">Upload Memo (PDF/Doc)</span>
+                        {files.filter(f => f.type === 'memo').length > 0 && <span className="text-xs text-brand-teal mt-1">File Selected</span>}
+                    </div>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer"
+                        onClick={() => invoiceInputRef.current?.click()}>
+                        <input type="file" ref={invoiceInputRef} className="hidden" accept="image/*,.pdf" onChange={(e) => handleFileChange(e, 'invoice')} />
+                        <Upload className="mx-auto h-8 w-8 text-gray-400" />
+                        <span className="mt-2 block text-sm font-medium text-gray-600">Upload Invoice</span>
+                        {files.filter(f => f.type === 'invoice').length > 0 && <span className="text-xs text-brand-teal mt-1">File Selected</span>}
+                    </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Select Authorizer</label>
+                        <select required className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                            value={selectedAuthorizer} onChange={e => setSelectedAuthorizer(e.target.value)}>
+                            <option value="">-- Select --</option>
+                            {authorizers.map(a => <option key={a.id} value={a.id}>{a.name} ({a.department})</option>)}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Digital Sign Off</label>
+                        <input required type="text" placeholder={`Type "${user?.name}" to sign`}
+                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                            value={signOff} onChange={e => setSignOff(e.target.value)} />
+                    </div>
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-4 border-t">
+                    <button type="button" onClick={() => setIsFormOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Cancel</button>
+                    <button type="submit" disabled={loading} className="px-4 py-2 text-sm font-medium text-white bg-brand-teal rounded-md hover:bg-[#008f7a] disabled:opacity-50">
+                        {loading ? 'Processing...' : (editingRequestId ? 'Update Request' : 'Submit Request')}
+                    </button>
+                </div>
+                </form>
+            </div>
           </div>
         </div>
       )}
