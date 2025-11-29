@@ -1,3 +1,4 @@
+
 import { Role, User, PaymentRequest, RequestStatus, ChatMessage } from "../types";
 
 export const MOCK_USERS: User[] = [
@@ -20,6 +21,8 @@ export const MOCK_REQUESTS: PaymentRequest[] = [
     paymentDetails: 'Bank: Citi, Acc: 123456',
     amount: 1250.00,
     currency: 'GHS',
+    billingProject: 'YOTA Main',
+    requestSubject: 'Q3 Marketing Material Printing',
     description: 'Printing of Q3 marketing brochures and flyers for the upcoming trade show.',
     files: [{ name: 'invoice_101.pdf', type: 'invoice', url: '#' }, { name: 'approval_memo.docx', type: 'memo', url: '#' }],
     authorizerId: 'u3',
@@ -39,6 +42,8 @@ export const MOCK_REQUESTS: PaymentRequest[] = [
     paymentDetails: 'PayPal: pay@cloud.com',
     amount: 450.00,
     currency: 'USD',
+    billingProject: 'Skills Hub',
+    requestSubject: 'Monthly Server Hosting',
     description: 'Monthly server hosting fee for the main website.',
     files: [{ name: 'inv_jan.pdf', type: 'invoice', url: '#' }],
     authorizerId: 'u4',
@@ -58,6 +63,8 @@ export const MOCK_REQUESTS: PaymentRequest[] = [
     paymentDetails: 'Wire Transfer',
     amount: 3000.00,
     currency: 'GHS',
+    billingProject: 'Youth Excel',
+    requestSubject: 'Gala Dinner Decoration',
     description: 'Decoration services for the annual gala dinner.',
     files: [],
     authorizerId: 'u3',

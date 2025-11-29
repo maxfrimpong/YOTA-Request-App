@@ -1,11 +1,11 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { RequestStatus, Role, RequestFile, PaymentRequest } from '../types';
-import { PlusCircle, Upload, CheckCircle, XCircle, Clock, AlertCircle, Eye, FileText, Download, X, Edit3, CreditCard, Smartphone, Landmark } from 'lucide-react';
+import { PlusCircle, Upload, CheckCircle, XCircle, Clock, AlertCircle, Eye, FileText, Download, X, Edit3, CreditCard, Smartphone, Landmark, Briefcase, FileType } from 'lucide-react';
 
 export const StaffDashboard = () => {
-  const { user, requests, users, addRequest, editRequest } = useApp();
+  const { user, requests, users, addRequest, editRequest, systemLists } = useApp();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [editingRequestId, setEditingRequestId] = useState<string | null>(null);
@@ -17,17 +17,21 @@ export const StaffDashboard = () => {
   // Form State
   const [vendor, setVendor] = useState('');
   const [amount, setAmount] = useState('');
-  const [currency, setCurrency] = useState<'GHS' | 'USD' | 'EUR' | 'GBP'>('GHS');
+  const [currency, setCurrency] = useState('GHS');
+  const [billingProject, setBillingProject] = useState('');
+  const [requestSubject, setRequestSubject] = useState('');
   const [description, setDescription] = useState('');
   const [selectedAuthorizer, setSelectedAuthorizer] = useState('');
   const [signOff, setSignOff] = useState('');
   const [files, setFiles] = useState<{name: string, type: 'memo'|'invoice'|'other'}[]>([]);
 
   // Payment Details State
-  const [paymentMethod, setPaymentMethod] = useState<'Mobile Money' | 'Bank Account'>('Mobile Money');
+  const [paymentMethod, setPaymentMethod] = useState(''); // Initialized empty, set in useEffect
+  
   // Momo Fields
-  const [momoOperator, setMomoOperator] = useState('MTN Momo');
+  const [momoOperator, setMomoOperator] = useState('');
   const [momoNumber, setMomoNumber] = useState('');
+  
   // Bank Fields
   const [bankName, setBankName] = useState('');
   const [accName, setAccName] = useState('');
@@ -35,6 +39,9 @@ export const StaffDashboard = () => {
   const [branchName, setBranchName] = useState('');
   const [sortCode, setSortCode] = useState('');
   const [swift, setSwift] = useState('');
+  
+  // Generic Fields (for other methods)
+  const [genericPaymentDetails, setGenericPaymentDetails] = useState('');
 
   // Refs for file inputs
   const memoInputRef = useRef<HTMLInputElement>(null);
@@ -43,6 +50,19 @@ export const StaffDashboard = () => {
   // Filter users who have the AUTHORIZER role
   const authorizers = users.filter(u => u.roles.includes(Role.AUTHORIZER));
   const myRequests = requests.filter(r => r.requesterId === user?.id);
+
+  // Defaults
+  useEffect(() => {
+      if (systemLists.paymentMethods.length > 0 && !paymentMethod) {
+          setPaymentMethod(systemLists.paymentMethods[0]);
+      }
+      if (systemLists.momoOperators.length > 0 && !momoOperator) {
+          setMomoOperator(systemLists.momoOperators[0]);
+      }
+      if (systemLists.currencies.length > 0 && !currency) {
+          setCurrency(systemLists.currencies[0]);
+      }
+  }, [systemLists]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'memo' | 'invoice') => {
     if (e.target.files && e.target.files[0]) {
@@ -62,6 +82,8 @@ export const StaffDashboard = () => {
       setVendor(req.vendorName);
       setAmount(req.amount.toString());
       setCurrency(req.currency);
+      setBillingProject(req.billingProject || '');
+      setRequestSubject(req.requestSubject || '');
       setDescription(req.description);
       setSelectedAuthorizer(req.authorizerId);
       setSignOff(req.signOff);
@@ -69,8 +91,20 @@ export const StaffDashboard = () => {
 
       // Attempt to parse payment details
       const details = req.paymentDetails || '';
-      if (details.startsWith('Mobile Money')) {
-          setPaymentMethod('Mobile Money');
+      
+      // Determine method from details string prefix
+      let foundMethod = systemLists.paymentMethods.find(m => details.startsWith(m));
+      
+      // Fallback detection
+      if (!foundMethod) {
+          if (details.includes('Mobile Money') || details.includes('Momo')) foundMethod = 'Mobile Money';
+          else if (details.includes('Bank')) foundMethod = 'Bank Account';
+          else foundMethod = systemLists.paymentMethods[0];
+      }
+
+      setPaymentMethod(foundMethod || '');
+
+      if (details.includes('Mobile Money') || details.includes('Momo')) {
           // Format: Mobile Money - OPERATOR: NUMBER
           const parts = details.split(':');
           if (parts.length >= 2) {
@@ -78,10 +112,7 @@ export const StaffDashboard = () => {
               if (opPart) setMomoOperator(opPart);
               setMomoNumber(parts[1]?.trim() || '');
           }
-      } else if (details.startsWith('Bank Transfer')) {
-          setPaymentMethod('Bank Account');
-          // Simple parsing strategy or just dump into Bank Name if complex
-          // Format: Bank Transfer - Bank: X, Name: Y, No: Z, Branch: A, Code: B, SWIFT: C
+      } else if (details.includes('Bank')) {
           const bankMatch = details.match(/Bank:\s*([^,]+)/);
           const nameMatch = details.match(/Name:\s*([^,]+)/);
           const noMatch = details.match(/No:\s*([^,]+)/);
@@ -96,12 +127,20 @@ export const StaffDashboard = () => {
           if (codeMatch) setSortCode(codeMatch[1].trim());
           if (swiftMatch) setSwift(swiftMatch[1].trim());
       } else {
-          // Fallback for legacy data
-          setPaymentMethod('Bank Account');
-          setBankName(details); // Put everything in bank name so user sees it
+          setGenericPaymentDetails(details);
       }
 
       setIsFormOpen(true);
+  };
+
+  const isMomoMethod = (method: string) => {
+      const m = method.toLowerCase();
+      return m.includes('mobile') || m.includes('momo');
+  };
+
+  const isBankMethod = (method: string) => {
+      const m = method.toLowerCase();
+      return m.includes('bank');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -115,10 +154,12 @@ export const StaffDashboard = () => {
 
     // Construct Payment Details String
     let finalPaymentDetails = '';
-    if (paymentMethod === 'Mobile Money') {
-        finalPaymentDetails = `Mobile Money - ${momoOperator}: ${momoNumber}`;
+    if (isMomoMethod(paymentMethod)) {
+        finalPaymentDetails = `${paymentMethod} - ${momoOperator}: ${momoNumber}`;
+    } else if (isBankMethod(paymentMethod)) {
+        finalPaymentDetails = `${paymentMethod} - Bank: ${bankName}, Name: ${accName}, No: ${accNumber}, Branch: ${branchName}, Code: ${sortCode}, SWIFT: ${swift}`;
     } else {
-        finalPaymentDetails = `Bank Transfer - Bank: ${bankName}, Name: ${accName}, No: ${accNumber}, Branch: ${branchName}, Code: ${sortCode}, SWIFT: ${swift}`;
+        finalPaymentDetails = `${paymentMethod} - ${genericPaymentDetails}`;
     }
 
     setLoading(true);
@@ -130,6 +171,8 @@ export const StaffDashboard = () => {
             vendorName: vendor,
             amount: parseFloat(amount),
             currency,
+            billingProject,
+            requestSubject,
             description,
             paymentDetails: finalPaymentDetails,
             authorizerId: selectedAuthorizer,
@@ -147,6 +190,8 @@ export const StaffDashboard = () => {
             paymentDetails: finalPaymentDetails,
             amount: parseFloat(amount),
             currency,
+            billingProject,
+            requestSubject,
             description,
             files: files.map(f => ({ ...f, url: '#' })),
             authorizerId: selectedAuthorizer,
@@ -163,7 +208,9 @@ export const StaffDashboard = () => {
   const resetForm = () => {
     setVendor('');
     setAmount('');
-    setCurrency('GHS');
+    setCurrency(systemLists.currencies[0] || 'GHS');
+    setBillingProject('');
+    setRequestSubject('');
     setDescription('');
     setSelectedAuthorizer('');
     setSignOff('');
@@ -171,8 +218,8 @@ export const StaffDashboard = () => {
     setEditingRequestId(null);
     
     // Reset Payment fields
-    setPaymentMethod('Mobile Money');
-    setMomoOperator('MTN Momo');
+    setPaymentMethod(systemLists.paymentMethods[0] || '');
+    setMomoOperator(systemLists.momoOperators[0] || '');
     setMomoNumber('');
     setBankName('');
     setAccName('');
@@ -180,6 +227,7 @@ export const StaffDashboard = () => {
     setBranchName('');
     setSortCode('');
     setSwift('');
+    setGenericPaymentDetails('');
   };
 
   const handleDownload = (file: RequestFile) => {
@@ -249,7 +297,7 @@ export const StaffDashboard = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject / Vendor</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -264,7 +312,12 @@ export const StaffDashboard = () => {
                 myRequests.map((req) => (
                     <tr key={req.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(req.createdAt).toLocaleDateString()}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{req.vendorName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <div className="flex flex-col">
+                        <span>{req.requestSubject}</span>
+                        <span className="text-xs text-gray-500 font-normal">{req.vendorName}</span>
+                      </div>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{req.currency} {req.amount.toLocaleString()}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                         {getStatusBadge(req.status)}
@@ -328,13 +381,21 @@ export const StaffDashboard = () => {
                      </div>
 
                      <div className="grid grid-cols-2 gap-4">
+                        <div className="col-span-2">
+                           <label className="block text-sm font-medium text-gray-500">Subject</label>
+                           <p className="text-gray-900 font-bold text-lg">{selectedRequest.requestSubject}</p>
+                        </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-500">Vendor</label>
-                            <p className="text-gray-900 font-medium">{selectedRequest.vendorName}</p>
+                           <label className="block text-sm font-medium text-gray-500">Billing Project</label>
+                           <p className="text-brand-teal font-medium">{selectedRequest.billingProject}</p>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-500">Date Submitted</label>
                             <p className="text-gray-900">{new Date(selectedRequest.createdAt).toLocaleDateString()}</p>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-500">Vendor</label>
+                            <p className="text-gray-900 font-medium">{selectedRequest.vendorName}</p>
                         </div>
                         <div className="col-span-2">
                             <label className="block text-sm font-medium text-gray-500">Payment Details</label>
@@ -411,21 +472,59 @@ export const StaffDashboard = () => {
                         value={vendor} onChange={e => setVendor(e.target.value)} />
                     </div>
                     <div>
-                    <label className="block text-sm font-medium text-gray-700">Amount</label>
+                    <label className="block text-sm font-medium text-gray-700">Amount (Currency)</label>
                     <div className="flex mt-1">
                         <select 
                             className="block rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal sm:text-sm"
                             value={currency}
-                            onChange={(e) => setCurrency(e.target.value as any)}
+                            onChange={(e) => setCurrency(e.target.value)}
                         >
-                            <option value="GHS">GHS</option>
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
-                            <option value="GBP">GBP</option>
+                            {systemLists.currencies.map(c => (
+                                <option key={c} value={c}>{c}</option>
+                            ))}
                         </select>
                         <input required type="number" step="0.01" className="block w-full rounded-r-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
                             value={amount} onChange={e => setAmount(e.target.value)} />
                     </div>
+                    </div>
+
+                    {/* New Billing Project Field */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Billing Project</label>
+                        <div className="relative mt-1">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Briefcase size={16} className="text-gray-400" />
+                            </div>
+                            <select 
+                                required
+                                className="pl-10 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                value={billingProject} 
+                                onChange={e => setBillingProject(e.target.value)}
+                            >
+                                <option value="">Select Project</option>
+                                {systemLists.billingProjects.map(p => (
+                                    <option key={p} value={p}>{p}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* New Request Subject Field */}
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700">Request Subject</label>
+                        <div className="relative mt-1">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <FileType size={16} className="text-gray-400" />
+                            </div>
+                            <input 
+                                required 
+                                type="text" 
+                                placeholder="e.g., Q3 Marketing Brochure Printing"
+                                className="pl-10 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                value={requestSubject} 
+                                onChange={e => setRequestSubject(e.target.value)} 
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -437,37 +536,18 @@ export const StaffDashboard = () => {
                     
                     <div className="mb-4">
                         <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Payment Method</label>
-                        <div className="flex space-x-4">
-                            <label className={`flex items-center space-x-2 cursor-pointer p-2 rounded border ${paymentMethod === 'Mobile Money' ? 'bg-white border-brand-teal ring-1 ring-brand-teal' : 'border-gray-300 hover:bg-white'}`}>
-                                <input 
-                                    type="radio" 
-                                    name="paymentMethod" 
-                                    className="text-brand-teal focus:ring-brand-teal"
-                                    checked={paymentMethod === 'Mobile Money'}
-                                    onChange={() => setPaymentMethod('Mobile Money')}
-                                />
-                                <div className="flex items-center">
-                                    <Smartphone size={16} className="mr-2 text-gray-600"/>
-                                    <span className="text-sm font-medium">Mobile Money</span>
-                                </div>
-                            </label>
-                            <label className={`flex items-center space-x-2 cursor-pointer p-2 rounded border ${paymentMethod === 'Bank Account' ? 'bg-white border-brand-teal ring-1 ring-brand-teal' : 'border-gray-300 hover:bg-white'}`}>
-                                <input 
-                                    type="radio" 
-                                    name="paymentMethod" 
-                                    className="text-brand-teal focus:ring-brand-teal"
-                                    checked={paymentMethod === 'Bank Account'}
-                                    onChange={() => setPaymentMethod('Bank Account')}
-                                />
-                                <div className="flex items-center">
-                                    <Landmark size={16} className="mr-2 text-gray-600"/>
-                                    <span className="text-sm font-medium">Bank Account</span>
-                                </div>
-                            </label>
-                        </div>
+                        <select 
+                            className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal sm:text-sm"
+                            value={paymentMethod}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                        >
+                            {systemLists.paymentMethods.map(m => (
+                                <option key={m} value={m}>{m}</option>
+                            ))}
+                        </select>
                     </div>
 
-                    {paymentMethod === 'Mobile Money' ? (
+                    {isMomoMethod(paymentMethod) ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Network Operator</label>
@@ -477,9 +557,9 @@ export const StaffDashboard = () => {
                                     value={momoOperator}
                                     onChange={(e) => setMomoOperator(e.target.value)}
                                 >
-                                    <option value="MTN Momo">MTN Momo</option>
-                                    <option value="Telecel Cash">Telecel Cash</option>
-                                    <option value="AT Cash">AT Cash</option>
+                                    {systemLists.momoOperators.map(op => (
+                                        <option key={op} value={op}>{op}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div>
@@ -494,7 +574,7 @@ export const StaffDashboard = () => {
                                 />
                             </div>
                         </div>
-                    ) : (
+                    ) : isBankMethod(paymentMethod) ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700">Bank Name</label>
@@ -556,6 +636,19 @@ export const StaffDashboard = () => {
                                     onChange={(e) => setSwift(e.target.value)}
                                 />
                             </div>
+                        </div>
+                    ) : (
+                        // Generic Fallback for unknown methods
+                        <div className="animate-in fade-in slide-in-from-top-2">
+                            <label className="block text-sm font-medium text-gray-700">Payment Details</label>
+                            <textarea 
+                                required 
+                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                rows={3}
+                                placeholder="Enter relevant payment information..."
+                                value={genericPaymentDetails}
+                                onChange={(e) => setGenericPaymentDetails(e.target.value)}
+                            />
                         </div>
                     )}
                 </div>

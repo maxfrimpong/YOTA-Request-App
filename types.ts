@@ -41,7 +41,9 @@ export interface PaymentRequest {
   vendorName: string;
   paymentDetails: string;
   amount: number;
-  currency: 'GHS' | 'USD' | 'EUR' | 'GBP';
+  currency: string; // Changed from enum to string to support dynamic lists
+  billingProject: string; // New field
+  requestSubject: string; // New field
   description: string;
   files: RequestFile[];
   authorizerId: string;
@@ -71,6 +73,13 @@ export interface ChatMessage {
   isRead: boolean;
 }
 
+export interface SystemLists {
+  currencies: string[];
+  billingProjects: string[];
+  paymentMethods: string[];
+  momoOperators: string[];
+}
+
 export interface AuthContextType {
   user: User | null;
   activeRole: Role | null; // The currently selected role for the session
@@ -80,6 +89,7 @@ export interface AuthContextType {
   messages: ChatMessage[];
   logoUrl: string;
   onlineUserIds: string[];
+  systemLists: SystemLists;
   login: (email: string, password: string) => boolean;
   logout: () => void;
   switchRole: (role: Role) => void;
@@ -93,4 +103,5 @@ export interface AuthContextType {
   sendMessage: (receiverId: string, content: string) => void;
   markChatAsRead: (senderId: string) => void;
   updateLogo: (url: string) => void;
+  updateSystemList: (listName: keyof SystemLists, newList: string[]) => void;
 }

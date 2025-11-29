@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { RequestStatus, Role, User } from '../types';
-import { Users, LayoutDashboard, UserPlus, X, Shield, Briefcase, Mail, Key, Edit2, Settings, Upload, Image as ImageIcon } from 'lucide-react';
+import { RequestStatus, Role, User, SystemLists } from '../types';
+import { Users, LayoutDashboard, UserPlus, X, Shield, Briefcase, Mail, Key, Edit2, Settings, Upload, Image as ImageIcon, Plus, Trash2, List, Save, XCircle } from 'lucide-react';
 
 const DEPARTMENTS = [
   "Finance", 
@@ -30,7 +30,7 @@ const POSITIONS = [
   "Digital Engagement Associate", 
   "IT Manager",
   "IT Officer",
-  "IT Associate",
+  "IT Associate", 
   "Operations Manager", 
   "Operations Support Officer", 
   "Driver", 
@@ -43,8 +43,133 @@ const POSITIONS = [
   "Intern"
 ];
 
+const ListManager = ({ title, items, onUpdate }: { title: string, items: string[], onUpdate: (newItems: string[]) => void }) => {
+    const [newItem, setNewItem] = useState('');
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [editValue, setEditValue] = useState('');
+
+    const handleAdd = () => {
+        const trimmed = newItem.trim();
+        if (trimmed && !items.includes(trimmed)) {
+            onUpdate([...items, trimmed]);
+            setNewItem('');
+        }
+    };
+
+    const handleDelete = (index: number) => {
+        if (window.confirm(`Are you sure you want to delete "${items[index]}"?`)) {
+            const newItems = items.filter((_, i) => i !== index);
+            onUpdate(newItems);
+        }
+    };
+
+    const startEdit = (index: number, currentValue: string) => {
+        setEditingIndex(index);
+        setEditValue(currentValue);
+    };
+
+    const cancelEdit = () => {
+        setEditingIndex(null);
+        setEditValue('');
+    };
+
+    const saveEdit = (index: number) => {
+        const trimmed = editValue.trim();
+        if (trimmed) {
+             // Check for duplicates, but allow if it's the same item being edited (no change)
+             const isDuplicate = items.some((item, i) => i !== index && item.toLowerCase() === trimmed.toLowerCase());
+             
+             if (isDuplicate) {
+                 alert('This item already exists in the list.');
+                 return;
+             }
+
+             const newItems = [...items];
+             newItems[index] = trimmed;
+             onUpdate(newItems);
+             setEditingIndex(null);
+             setEditValue('');
+        }
+    };
+
+    return (
+        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col h-full">
+            <h4 className="font-bold text-gray-700 mb-3 text-sm uppercase tracking-wide flex items-center">
+                <List size={14} className="mr-2" /> {title}
+            </h4>
+            
+            {/* Add Item Input */}
+            <div className="flex space-x-2 mb-3">
+                <input 
+                    type="text" 
+                    value={newItem}
+                    onChange={(e) => setNewItem(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+                    placeholder="Add new item..."
+                    className="flex-1 text-sm border-gray-300 rounded focus:ring-brand-teal focus:border-brand-teal px-2 py-1"
+                />
+                <button 
+                    type="button"
+                    onClick={handleAdd}
+                    className="bg-brand-teal text-white p-1.5 rounded hover:bg-[#008f7a] transition-colors"
+                >
+                    <Plus size={16} />
+                </button>
+            </div>
+
+            {/* List Items */}
+            <div className="flex-1 overflow-y-auto max-h-40 space-y-1 pr-1 custom-scrollbar">
+                {items.length === 0 && <p className="text-xs text-gray-400 italic">No items yet.</p>}
+                {items.map((item, index) => (
+                    <div key={index} className="flex justify-between items-center bg-white p-2 rounded border border-gray-100 text-sm group min-h-[40px]">
+                        {editingIndex === index ? (
+                            <div className="flex flex-1 items-center space-x-2">
+                                <input 
+                                    type="text" 
+                                    autoFocus
+                                    value={editValue}
+                                    onChange={(e) => setEditValue(e.target.value)}
+                                    className="flex-1 text-sm border-brand-teal rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-brand-teal"
+                                />
+                                <button type="button" onClick={() => saveEdit(index)} className="text-brand-teal hover:text-[#008f7a]">
+                                    <Save size={14} />
+                                </button>
+                                <button type="button" onClick={cancelEdit} className="text-gray-400 hover:text-gray-600">
+                                    <XCircle size={14} />
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <span className="text-gray-700 flex-1 truncate mr-2" title={item}>{item}</span>
+                                <div className="flex space-x-1 items-center">
+                                    <button 
+                                        type="button"
+                                        onClick={() => startEdit(index, item)}
+                                        className="text-gray-400 hover:text-brand-teal p-1 rounded transition-colors"
+                                        title="Rename"
+                                    >
+                                        <Edit2 size={14} />
+                                    </button>
+                                    <button 
+                                        type="button"
+                                        onClick={() => handleDelete(index)}
+                                        className="text-gray-400 hover:text-red-500 p-1 rounded transition-colors"
+                                        title="Delete"
+                                    >
+                                        <Trash2 size={14} />
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
 export const AdminDashboard = () => {
-  const { requests, users, addUser, editUser, updateLogo, logoUrl } = useApp();
+  const { requests, users, addUser, editUser, updateLogo, logoUrl, systemLists, updateSystemList } = useApp();
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'settings'>('overview');
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
@@ -107,8 +232,6 @@ export const AdminDashboard = () => {
   const toggleRole = (role: Role) => {
     setNewRoles(prev => {
         if (prev.includes(role)) {
-            // Prevent removing the last role if desired, or just allow empty
-            // For now, let's allow it but warn on submit if empty
             return prev.filter(r => r !== role);
         } else {
             return [...prev, role];
@@ -144,7 +267,6 @@ export const AdminDashboard = () => {
       });
     }
     
-    // Reset and Close
     setIsUserModalOpen(false);
   };
 
@@ -361,6 +483,7 @@ export const AdminDashboard = () => {
 
       {activeTab === 'settings' && (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+               {/* Branding Section */}
                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                     <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                         <ImageIcon size={20} className="text-brand-teal" />
@@ -391,12 +514,36 @@ export const AdminDashboard = () => {
                     </div>
                </div>
 
-               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 opacity-60">
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
-                        <Shield size={20} className="text-gray-500" />
-                        Other System Settings
+               {/* System Lists Management */}
+               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <Shield size={20} className="text-brand-teal" />
+                        System Dropdown Lists
                     </h3>
-                    <p className="text-sm text-gray-500">Additional system configurations are currently disabled in demo mode.</p>
+                    <p className="text-sm text-gray-500 mb-4">Manage the options available in dropdown menus across the application.</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <ListManager 
+                            title="Currencies (Amount)" 
+                            items={systemLists.currencies} 
+                            onUpdate={(newList) => updateSystemList('currencies', newList)}
+                        />
+                        <ListManager 
+                            title="Billing Projects" 
+                            items={systemLists.billingProjects} 
+                            onUpdate={(newList) => updateSystemList('billingProjects', newList)}
+                        />
+                         <ListManager 
+                            title="Payment Methods" 
+                            items={systemLists.paymentMethods} 
+                            onUpdate={(newList) => updateSystemList('paymentMethods', newList)}
+                        />
+                        <ListManager 
+                            title="Momo Operators" 
+                            items={systemLists.momoOperators} 
+                            onUpdate={(newList) => updateSystemList('momoOperators', newList)}
+                        />
+                    </div>
                </div>
           </div>
       )}

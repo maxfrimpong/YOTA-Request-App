@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { RequestStatus, PaymentRequest, RequestFile } from '../types';
@@ -71,9 +72,9 @@ export const AuthorizerDashboard = () => {
                 pendingRequests.map(req => (
                     <div key={req.id} className="p-4 hover:bg-gray-50 transition-colors flex justify-between items-start">
                         <div>
-                            <p className="font-medium text-gray-900">{req.vendorName} - {req.currency} {req.amount.toLocaleString()}</p>
-                            <p className="text-sm text-gray-500">From: {req.requesterName} ({req.department})</p>
-                            <p className="text-xs text-gray-400 mt-1">{new Date(req.createdAt).toLocaleDateString()}</p>
+                            <p className="font-bold text-gray-900">{req.requestSubject}</p>
+                            <p className="text-sm text-gray-600">{req.vendorName} - {req.currency} {req.amount.toLocaleString()}</p>
+                            <p className="text-xs text-gray-400 mt-1">From: {req.requesterName} ({req.department})</p>
                         </div>
                         <button 
                             onClick={() => setSelectedRequest(req)}
@@ -98,7 +99,8 @@ export const AuthorizerDashboard = () => {
                <div className="p-6">
                     <div className="flex justify-between items-start mb-6">
                         <div>
-                           <h3 className="text-xl font-bold text-gray-900">{selectedRequest.vendorName}</h3>
+                           <h3 className="text-xl font-bold text-gray-900">{selectedRequest.requestSubject}</h3>
+                           <p className="text-sm text-gray-500">{selectedRequest.vendorName}</p>
                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1
                                 ${selectedRequest.status === RequestStatus.AUTHORIZED ? 'bg-brand-dark/10 text-brand-dark' : 
                                   selectedRequest.status === RequestStatus.APPROVED ? 'bg-brand-teal/10 text-brand-teal' : 
@@ -119,6 +121,10 @@ export const AuthorizerDashboard = () => {
                             <div>
                                 <span className="text-gray-500 block">Department</span>
                                 <span className="font-medium">{selectedRequest.department}</span>
+                            </div>
+                            <div className="col-span-2">
+                                <span className="text-gray-500 block">Billing Project</span>
+                                <span className="font-medium text-brand-teal">{selectedRequest.billingProject}</span>
                             </div>
                             <div className="col-span-2">
                                 <span className="text-gray-500 block">Payment Details</span>
@@ -222,7 +228,7 @@ export const AuthorizerDashboard = () => {
                 <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Requester</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vendor</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subject</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Remarks</th>
@@ -234,7 +240,7 @@ export const AuthorizerDashboard = () => {
                     <tr key={req.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(req.updatedAt).toLocaleDateString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{req.requesterName}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{req.vendorName}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{req.requestSubject}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{req.currency} {req.amount.toLocaleString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                             <span className={`px-2 py-1 rounded-full text-xs font-medium 

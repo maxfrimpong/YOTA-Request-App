@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { RequestStatus, PaymentRequest, RequestFile } from '../types';
@@ -134,10 +135,10 @@ export const ApproverDashboard = () => {
                             className={`p-4 cursor-pointer hover:bg-brand-teal/5 transition-colors border-l-4 ${selectedRequest?.id === req.id ? 'bg-brand-teal/5 border-brand-teal' : 'border-transparent'}`}
                         >
                             <div className="flex justify-between items-start">
-                                <h4 className="font-bold text-gray-900">{req.vendorName}</h4>
-                                <span className="font-semibold text-brand-teal text-sm">{req.currency} {req.amount.toLocaleString()}</span>
+                                <h4 className="font-bold text-gray-900">{req.requestSubject}</h4>
+                                <span className="font-semibold text-brand-teal text-sm">{req.currency} {req.amount.toLocaleString()}</p>
                             </div>
-                            <p className="text-sm text-gray-600 mt-1">{req.requesterName}</p>
+                            <p className="text-sm text-gray-600 mt-1">{req.vendorName}</p>
                             <p className="text-xs text-gray-400 mt-1">{new Date(req.createdAt).toLocaleDateString()}</p>
                         </div>
                     ))
@@ -180,7 +181,7 @@ export const ApproverDashboard = () => {
                     {/* Header for non-actionable requests */}
                     {selectedRequest.status !== RequestStatus.AUTHORIZED && (
                         <div className="flex items-center justify-between border-b pb-4">
-                            <h3 className="text-2xl font-bold text-gray-900">{selectedRequest.vendorName}</h3>
+                            <h3 className="text-2xl font-bold text-gray-900">{selectedRequest.requestSubject}</h3>
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${selectedRequest.status === RequestStatus.APPROVED ? 'bg-brand-teal/10 text-brand-teal' : 'bg-brand-orange/10 text-brand-orange'}`}>
                                 {selectedRequest.status}
                             </span>
@@ -199,6 +200,14 @@ export const ApproverDashboard = () => {
                          <div className="space-y-1">
                              <span className="text-gray-500">Department</span>
                              <div className="font-medium">{selectedRequest.department}</div>
+                         </div>
+                         <div className="space-y-1 col-span-2">
+                             <span className="text-gray-500">Billing Project</span>
+                             <div className="font-medium text-brand-teal">{selectedRequest.billingProject}</div>
+                         </div>
+                         <div className="space-y-1 col-span-2">
+                             <span className="text-gray-500">Vendor</span>
+                             <div className="font-medium">{selectedRequest.vendorName}</div>
                          </div>
                          <div className="space-y-1 col-span-2">
                              <span className="text-gray-500">Original Description</span>
@@ -291,7 +300,7 @@ export const ApproverDashboard = () => {
                 <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Requester</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vendor</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subject</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Remarks</th>
@@ -308,7 +317,7 @@ export const ApproverDashboard = () => {
                         <tr key={req.id}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(req.updatedAt).toLocaleDateString()}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{req.requesterName}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{req.vendorName}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{req.requestSubject}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{req.currency} {req.amount.toLocaleString()}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${req.status === RequestStatus.APPROVED ? 'bg-brand-teal/10 text-brand-teal' : 'bg-brand-orange/10 text-brand-orange'}`}>

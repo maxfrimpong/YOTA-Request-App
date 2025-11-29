@@ -1,3 +1,4 @@
+
 import { GoogleGenAI } from "@google/genai";
 import { PaymentRequest } from "../types";
 
@@ -17,9 +18,11 @@ export const summarizeRequest = async (request: PaymentRequest): Promise<string>
   const prompt = `
     You are an executive assistant helping an Executive Director review payment requests quickly.
     Summarize the following payment request into 2-3 concise sentences. 
-    Highlight the vendor, the amount, the purpose (description), and the department.
+    Highlight the vendor, the amount, the project, and the purpose (description).
     
     Request Details:
+    - Subject: ${request.requestSubject}
+    - Billing Project: ${request.billingProject}
     - Vendor: ${request.vendorName}
     - Amount: ${request.currency} ${request.amount}
     - Department: ${request.department}

@@ -1,9 +1,20 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { User, PaymentRequest, RequestStatus, Role, AuthContextType, Notification, ChatMessage } from '../types';
+import { User, PaymentRequest, RequestStatus, Role, AuthContextType, Notification, ChatMessage, SystemLists } from '../types';
 import { MOCK_USERS, MOCK_REQUESTS, MOCK_MESSAGES } from './MockData';
 
 const AppContext = createContext<AuthContextType | undefined>(undefined);
+
+const DEFAULT_LISTS: SystemLists = {
+  currencies: ['GHS', 'USD', 'EUR', 'GBP'],
+  billingProjects: [
+    "Skills Hub", "Adwuma Pa", "PASEWAY", "Africa Youth Partnership", 
+    "YES-PACT", "Get Into", "Youth Excel", "Youth on Board", 
+    "YOTA Main", "YOTA USD", "YOTA GBP", "AYP 2", "GYEOS"
+  ],
+  paymentMethods: ['Mobile Money', 'Bank Account'],
+  momoOperators: ['MTN Momo', 'Telecel Cash', 'AT Cash']
+};
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -14,15 +25,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [messages, setMessages] = useState<ChatMessage[]>(MOCK_MESSAGES);
   const [logoUrl, setLogoUrl] = useState<string>('logo.png');
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
+  const [systemLists, setSystemLists] = useState<SystemLists>(DEFAULT_LISTS);
   
-  // Simulate persistent login and logo for demo smoothness
+  // Simulate persistent login, logo, and lists
   useEffect(() => {
     const storedUserId = localStorage.getItem('sendreq_user_id');
     if (storedUserId) {
       const found = users.find(u => u.id === storedUserId);
       if (found) {
         setUser(found);
-        // Default to first role if not set
         if (!activeRole && found.roles.length > 0) {
             setActiveRole(found.roles[0]);
         }
@@ -34,13 +45,18 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setLogoUrl(storedLogo);
     }
 
-    // Simulate online users (Randomly pick 50% of users to be online)
+    const storedLists = localStorage.getItem('sendreq_lists');
+    if (storedLists) {
+        setSystemLists(JSON.parse(storedLists));
+    }
+
+    // Simulate online users
     const randomOnline = users
         .filter(() => Math.random() > 0.4)
         .map(u => u.id);
     setOnlineUserIds(randomOnline);
 
-  }, [users]); // Re-run when users list changes
+  }, [users]); 
 
   // Update online status when user logs in/out
   useEffect(() => {
@@ -56,7 +72,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     );
     if (foundUser) {
       setUser(foundUser);
-      // Set initial active role to the first one assigned
       setActiveRole(foundUser.roles.length > 0 ? foundUser.roles[0] : Role.STAFF);
       localStorage.setItem('sendreq_user_id', foundUser.id);
       return true;
@@ -65,7 +80,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    // Remove current user from online list locally
     if (user) {
         setOnlineUserIds(prev => prev.filter(id => id !== user.id));
     }
@@ -83,6 +97,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const updateLogo = (url: string) => {
       setLogoUrl(url);
       localStorage.setItem('sendreq_logo', url);
+  };
+
+  const updateSystemList = (listName: keyof SystemLists, newList: string[]) => {
+      setSystemLists(prev => {
+          const updated = { ...prev, [listName]: newList };
+          localStorage.setItem('sendreq_lists', JSON.stringify(updated));
+          return updated;
+      });
   };
 
   const createNotification = (userId: string, message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') => {
@@ -108,7 +130,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
     setRequests(prev => [newRequest, ...prev]);
 
-    // Notify Authorizer
     if (reqData.authorizerId) {
       createNotification(
         reqData.authorizerId,
@@ -122,10 +143,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const originalRequest = requests.find(r => r.id === id);
     if (!originalRequest) return;
 
-    if (originalRequest.editCount >= 2) {
-      // Should be prevented by UI, but safety check
-      return;
-    }
+    if (originalRequest.editCount >= 2) return;
 
     setRequests(prev => prev.map(req => {
       if (req.id === id) {
@@ -134,16 +152,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           ...updatedData,
           editCount: req.editCount + 1,
           updatedAt: new Date().toISOString(),
-          // Reset status to Pending Authorization if modified
           status: RequestStatus.PENDING_AUTHORIZATION,
-          // Reset remarks if any
           remarks: undefined
         };
       }
       return req;
     }));
 
-    // Notify Authorizer about the update
     const authId = updatedData.authorizerId || originalRequest.authorizerId;
     createNotification(
         authId,
@@ -153,7 +168,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateRequestStatus = (id: string, status: RequestStatus, remarks?: string) => {
-    // Find the request before updating to get current details
     const targetRequest = requests.find(r => r.id === id);
     
     setRequests(prev => prev.map(req => {
@@ -170,8 +184,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     if (!targetRequest) return;
 
-    // Logic to notify relevant parties
-    // 1. Notify Requester on any status change
     let requesterMsg = '';
     let requesterType: 'success' | 'error' | 'warning' | 'info' = 'info';
 
@@ -202,9 +214,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       createNotification(targetRequest.requesterId, requesterMsg, requesterType);
     }
 
-    // 2. Notify Approver (Executive Director) when Authorized
     if (status === RequestStatus.AUTHORIZED) {
-      // Find all approvers
       const approvers = users.filter(u => u.roles.includes(Role.APPROVER));
       approvers.forEach(approver => {
         createNotification(
@@ -215,14 +225,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       });
     }
 
-    // 3. Notify Authorizer when Approver takes action (Approved/Rejected)
     if (status === RequestStatus.APPROVED || status === RequestStatus.REJECTED_BY_APPROVER) {
       const authMsg = status === RequestStatus.APPROVED 
         ? `The request to ${targetRequest.vendorName} you authorized has been APPROVED by the Executive Director.`
         : `The request to ${targetRequest.vendorName} you authorized was REJECTED by the Executive Director.`;
       
       const authType = status === RequestStatus.APPROVED ? 'success' : 'warning';
-      
       createNotification(targetRequest.authorizerId, authMsg, authType);
     }
   };
@@ -239,7 +247,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setUsers(prev => prev.map(u => {
       if (u.id === id) {
         const updatedUser = { ...u, ...userData };
-        // If the edited user is the current logged-in user, update local session state immediately
         if (user && user.id === id) {
            setUser(updatedUser);
         }
@@ -282,9 +289,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AppContext.Provider value={{ 
-      user, activeRole, users, requests, notifications, messages, logoUrl, onlineUserIds,
+      user, activeRole, users, requests, notifications, messages, logoUrl, onlineUserIds, systemLists,
       login, logout, switchRole, addRequest, editRequest, updateRequestStatus, addUser, editUser,
-      markAsRead, markAllAsRead, sendMessage, markChatAsRead, updateLogo
+      markAsRead, markAllAsRead, sendMessage, markChatAsRead, updateLogo, updateSystemList
     }}>
       {children}
     </AppContext.Provider>
