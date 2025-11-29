@@ -16,14 +16,14 @@ export const Profile = () => {
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {/* Banner / Header */}
-        <div className="bg-gradient-to-r from-slate-800 to-slate-900 p-8 flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6">
-             <div className="h-24 w-24 rounded-full bg-white flex items-center justify-center text-slate-900 text-3xl font-bold border-4 border-white/20 shadow-xl shrink-0">
+        <div className="bg-brand-dark p-8 flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6">
+             <div className="h-24 w-24 rounded-full bg-white flex items-center justify-center text-brand-dark text-3xl font-bold border-4 border-white/20 shadow-xl shrink-0">
                 {user.name.charAt(0)}
              </div>
              <div className="text-center md:text-left pt-2">
                 <h3 className="text-2xl font-bold text-white">{user.name}</h3>
-                <p className="text-blue-200 font-medium">{user.position || 'Staff Member'}</p>
-                <div className="flex items-center justify-center md:justify-start space-x-2 text-slate-400 text-sm mt-1">
+                <p className="text-brand-teal font-medium">{user.position || 'Staff Member'}</p>
+                <div className="flex items-center justify-center md:justify-start space-x-2 text-gray-400 text-sm mt-1">
                     <Briefcase size={14} />
                     <span>{user.department}</span>
                 </div>
@@ -36,7 +36,7 @@ export const Profile = () => {
                 <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider border-b pb-2">Contact Information</h4>
                 
                 <div className="flex items-start space-x-4">
-                    <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                    <div className="p-2 bg-blue-50 rounded-lg text-brand-dark">
                         <Mail size={20} />
                     </div>
                     <div>
@@ -60,7 +60,7 @@ export const Profile = () => {
                 <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider border-b pb-2">Access & Roles</h4>
 
                 <div className="flex items-start space-x-4">
-                    <div className="p-2 bg-green-50 rounded-lg text-green-600">
+                    <div className="p-2 bg-green-50 rounded-lg text-brand-teal">
                          <Shield size={20} />
                     </div>
                     <div>
@@ -70,7 +70,7 @@ export const Profile = () => {
                                 <span key={role} className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize border
                                     ${role === 'ADMIN' ? 'bg-purple-50 text-purple-700 border-purple-100' : 
                                       role === 'APPROVER' ? 'bg-indigo-50 text-indigo-700 border-indigo-100' :
-                                      role === 'AUTHORIZER' ? 'bg-blue-50 text-blue-700 border-blue-100' : 
+                                      role === 'AUTHORIZER' ? 'bg-brand-dark/10 text-brand-dark border-brand-dark/20' : 
                                       'bg-gray-50 text-gray-700 border-gray-100'}`}>
                                     {role.replace('_', ' ')}
                                 </span>
@@ -79,8 +79,8 @@ export const Profile = () => {
                     </div>
                 </div>
                 
-                <div className="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-100">
-                     <p className="text-xs text-yellow-800">
+                <div className="mt-6 p-4 bg-brand-orange/5 rounded-lg border border-brand-orange/20">
+                     <p className="text-xs text-brand-orange">
                         To update your profile details or change your password, please contact the System Administrator.
                      </p>
                 </div>

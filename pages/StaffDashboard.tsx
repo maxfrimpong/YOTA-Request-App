@@ -97,13 +97,13 @@ export const StaffDashboard = () => {
   const getStatusBadge = (status: RequestStatus) => {
     switch (status) {
       case RequestStatus.APPROVED:
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><CheckCircle size={12} className="mr-1"/> Approved</span>;
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-teal/10 text-brand-teal"><CheckCircle size={12} className="mr-1"/> Approved</span>;
       case RequestStatus.AUTHORIZED:
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"><CheckCircle size={12} className="mr-1"/> Authorized</span>;
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-dark/10 text-brand-dark"><CheckCircle size={12} className="mr-1"/> Authorized</span>;
       case RequestStatus.PENDING_AUTHORIZATION:
         return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"><Clock size={12} className="mr-1"/> Pending</span>;
       case RequestStatus.FROZEN:
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800"><AlertCircle size={12} className="mr-1"/> Frozen</span>;
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-orange/10 text-brand-orange"><AlertCircle size={12} className="mr-1"/> Frozen</span>;
       default:
         return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"><XCircle size={12} className="mr-1"/> Rejected</span>;
     }
@@ -118,7 +118,7 @@ export const StaffDashboard = () => {
         </div>
         <button
           onClick={() => setIsFormOpen(true)}
-          className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-sm transition-colors"
+          className="flex items-center space-x-2 bg-brand-teal hover:bg-[#008f7a] text-white px-4 py-2 rounded-lg shadow-sm transition-colors"
         >
           <PlusCircle size={18} />
           <span>New Request</span>
@@ -129,11 +129,11 @@ export const StaffDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-lg shadow border border-gray-100">
             <p className="text-gray-500 text-sm">Total Submitted</p>
-            <p className="text-2xl font-bold">{myRequests.length}</p>
+            <p className="text-2xl font-bold text-gray-900">{myRequests.length}</p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow border border-gray-100">
             <p className="text-gray-500 text-sm">Approved</p>
-            <p className="text-2xl font-bold text-green-600">{myRequests.filter(r => r.status === RequestStatus.APPROVED).length}</p>
+            <p className="text-2xl font-bold text-brand-teal">{myRequests.filter(r => r.status === RequestStatus.APPROVED).length}</p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow border border-gray-100">
             <p className="text-gray-500 text-sm">Pending</p>
@@ -169,7 +169,7 @@ export const StaffDashboard = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <button 
                             onClick={() => setSelectedRequest(req)}
-                            className="text-blue-600 hover:text-blue-800 flex items-center space-x-1"
+                            className="text-brand-dark hover:text-brand-teal flex items-center space-x-1"
                         >
                             <Eye size={16} />
                             <span>View</span>
@@ -232,8 +232,8 @@ export const StaffDashboard = () => {
                      
                      {selectedRequest.remarks && (
                          <div className="bg-red-50 border border-red-100 rounded-lg p-4">
-                             <h4 className="text-sm font-bold text-red-800 mb-1">Remarks / Rejection Reason</h4>
-                             <p className="text-sm text-red-700">{selectedRequest.remarks}</p>
+                             <h4 className="text-sm font-bold text-brand-orange mb-1">Remarks / Rejection Reason</h4>
+                             <p className="text-sm text-gray-700">{selectedRequest.remarks}</p>
                          </div>
                      )}
 
@@ -244,7 +244,7 @@ export const StaffDashboard = () => {
                                 <button 
                                     key={i} 
                                     onClick={() => setPreviewFile(f)}
-                                    className="flex items-center space-x-2 text-xs bg-blue-50 text-blue-700 px-3 py-2 rounded-md border border-blue-100 hover:bg-blue-100 transition-colors"
+                                    className="flex items-center space-x-2 text-xs bg-brand-teal/5 text-brand-teal px-3 py-2 rounded-md border border-brand-teal/20 hover:bg-brand-teal/10 transition-colors"
                                 >
                                     <FileText size={14}/>
                                     <span className="font-medium">{f.name}</span>
@@ -276,14 +276,14 @@ export const StaffDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Vendor Name</label>
-                  <input required type="text" className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  <input required type="text" className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
                     value={vendor} onChange={e => setVendor(e.target.value)} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Amount</label>
                   <div className="flex mt-1">
                     <select 
-                        className="block rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 sm:text-sm"
+                        className="block rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal sm:text-sm"
                         value={currency}
                         onChange={(e) => setCurrency(e.target.value as any)}
                     >
@@ -292,7 +292,7 @@ export const StaffDashboard = () => {
                         <option value="EUR">EUR</option>
                         <option value="GBP">GBP</option>
                     </select>
-                    <input required type="number" step="0.01" className="block w-full rounded-r-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    <input required type="number" step="0.01" className="block w-full rounded-r-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
                         value={amount} onChange={e => setAmount(e.target.value)} />
                   </div>
                 </div>
@@ -300,13 +300,13 @@ export const StaffDashboard = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">Payment Details (Bank/Account)</label>
-                <input required type="text" className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                <input required type="text" className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
                   value={paymentDetails} onChange={e => setPaymentDetails(e.target.value)} />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">Description / Memo Content</label>
-                <textarea required rows={4} className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                <textarea required rows={4} className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
                   placeholder="Explain the purpose of this payment..."
                   value={description} onChange={e => setDescription(e.target.value)} />
               </div>
@@ -317,21 +317,21 @@ export const StaffDashboard = () => {
                     <input type="file" ref={memoInputRef} className="hidden" accept=".pdf,.doc,.docx" onChange={(e) => handleFileChange(e, 'memo')} />
                     <Upload className="mx-auto h-8 w-8 text-gray-400" />
                     <span className="mt-2 block text-sm font-medium text-gray-600">Upload Memo (PDF/Doc)</span>
-                    {files.filter(f => f.type === 'memo').length > 0 && <span className="text-xs text-green-600 mt-1">File Selected</span>}
+                    {files.filter(f => f.type === 'memo').length > 0 && <span className="text-xs text-brand-teal mt-1">File Selected</span>}
                  </div>
                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer"
                       onClick={() => invoiceInputRef.current?.click()}>
                     <input type="file" ref={invoiceInputRef} className="hidden" accept="image/*,.pdf" onChange={(e) => handleFileChange(e, 'invoice')} />
                     <Upload className="mx-auto h-8 w-8 text-gray-400" />
                     <span className="mt-2 block text-sm font-medium text-gray-600">Upload Invoice</span>
-                    {files.filter(f => f.type === 'invoice').length > 0 && <span className="text-xs text-green-600 mt-1">File Selected</span>}
+                    {files.filter(f => f.type === 'invoice').length > 0 && <span className="text-xs text-brand-teal mt-1">File Selected</span>}
                  </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Select Authorizer</label>
-                    <select required className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    <select required className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
                         value={selectedAuthorizer} onChange={e => setSelectedAuthorizer(e.target.value)}>
                         <option value="">-- Select --</option>
                         {authorizers.map(a => <option key={a.id} value={a.id}>{a.name} ({a.department})</option>)}
@@ -340,14 +340,14 @@ export const StaffDashboard = () => {
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Digital Sign Off</label>
                     <input required type="text" placeholder={`Type "${user?.name}" to sign`}
-                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
                         value={signOff} onChange={e => setSignOff(e.target.value)} />
                 </div>
               </div>
 
               <div className="flex justify-end space-x-3 pt-4 border-t">
                 <button type="button" onClick={() => setIsFormOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Cancel</button>
-                <button type="submit" disabled={loading} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50">
+                <button type="submit" disabled={loading} className="px-4 py-2 text-sm font-medium text-white bg-brand-teal rounded-md hover:bg-[#008f7a] disabled:opacity-50">
                     {loading ? 'Submitting...' : 'Submit Request'}
                 </button>
               </div>
@@ -362,8 +362,8 @@ export const StaffDashboard = () => {
           <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-[85vh] flex flex-col animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center p-4 border-b">
               <div className="flex items-center space-x-3">
-                <div className="bg-blue-100 p-2 rounded">
-                  <FileText size={20} className="text-blue-600"/>
+                <div className="bg-brand-teal/10 p-2 rounded">
+                  <FileText size={20} className="text-brand-teal"/>
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900">{previewFile.name}</h3>
@@ -414,7 +414,7 @@ export const StaffDashboard = () => {
             <div className="p-4 border-t bg-gray-50 flex justify-end">
               <button 
                 onClick={() => handleDownload(previewFile)}
-                className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
+                className="flex items-center space-x-2 bg-brand-teal hover:bg-[#008f7a] text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
               >
                 <Download size={18} />
                 <span>Download File</span>

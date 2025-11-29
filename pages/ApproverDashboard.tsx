@@ -39,7 +39,8 @@ export const ApproverDashboard = () => {
   });
   const statusData = Object.keys(statusDataMap).map(key => ({ name: key, count: statusDataMap[key] }));
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+  // New Brand Colors for Charts
+  const COLORS = ['#00a88f', '#006680', '#fa4515', '#ffc658', '#82ca9d'];
 
   useEffect(() => {
     if (selectedRequest && selectedRequest.status === RequestStatus.AUTHORIZED) {
@@ -95,18 +96,18 @@ export const ApproverDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider">Pending Approval</h3>
-            <p className="text-3xl font-bold text-blue-600 mt-2">GHS {totalPendingAmount.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-brand-dark mt-2">GHS {totalPendingAmount.toLocaleString()}</p>
             <p className="text-sm text-gray-400 mt-1">{pendingApprovals.length} requests waiting</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider">Total Approved (All Time)</h3>
-            <p className="text-3xl font-bold text-green-600 mt-2">GHS {totalAmountApproved.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-brand-teal mt-2">GHS {totalAmountApproved.toLocaleString()}</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center justify-center">
              <div className="w-full h-24">
                  <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={statusData}>
-                        <Bar dataKey="count" fill="#8884d8" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="count" fill="#00a88f" radius={[4, 4, 0, 0]} />
                         <Tooltip />
                     </BarChart>
                  </ResponsiveContainer>
@@ -130,11 +131,11 @@ export const ApproverDashboard = () => {
                         <div 
                             key={req.id} 
                             onClick={() => setSelectedRequest(req)}
-                            className={`p-4 cursor-pointer hover:bg-blue-50 transition-colors border-l-4 ${selectedRequest?.id === req.id ? 'bg-blue-50 border-blue-500' : 'border-transparent'}`}
+                            className={`p-4 cursor-pointer hover:bg-brand-teal/5 transition-colors border-l-4 ${selectedRequest?.id === req.id ? 'bg-brand-teal/5 border-brand-teal' : 'border-transparent'}`}
                         >
                             <div className="flex justify-between items-start">
                                 <h4 className="font-bold text-gray-900">{req.vendorName}</h4>
-                                <span className="font-semibold text-blue-600 text-sm">{req.currency} {req.amount.toLocaleString()}</span>
+                                <span className="font-semibold text-brand-teal text-sm">{req.currency} {req.amount.toLocaleString()}</span>
                             </div>
                             <p className="text-sm text-gray-600 mt-1">{req.requesterName}</p>
                             <p className="text-xs text-gray-400 mt-1">{new Date(req.createdAt).toLocaleDateString()}</p>
@@ -155,23 +156,23 @@ export const ApproverDashboard = () => {
                 <div className="space-y-6">
                     {/* Gemini Section - Only show for actionable requests */}
                     {selectedRequest.status === RequestStatus.AUTHORIZED && (
-                        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-xl border border-indigo-100 shadow-sm relative overflow-hidden">
-                            <div className="flex items-center space-x-2 text-indigo-700 font-semibold mb-3">
+                        <div className="bg-gradient-to-br from-brand-teal/5 to-brand-dark/5 p-6 rounded-xl border border-brand-teal/20 shadow-sm relative overflow-hidden">
+                            <div className="flex items-center space-x-2 text-brand-dark font-semibold mb-3">
                                 <Sparkles size={18} />
                                 <span>AI Summary (Gemini)</span>
                             </div>
                             {isSummarizing ? (
-                                <div className="flex items-center space-x-2 text-indigo-400 py-2">
+                                <div className="flex items-center space-x-2 text-brand-teal py-2">
                                     <Loader2 size={18} className="animate-spin" />
                                     <span>Generating executive summary...</span>
                                 </div>
                             ) : (
-                                <p className="text-indigo-900 leading-relaxed font-medium">
+                                <p className="text-gray-700 leading-relaxed font-medium">
                                     {geminiSummary}
                                 </p>
                             )}
                             <div className="absolute top-0 right-0 p-4 opacity-10">
-                                <Sparkles size={100} />
+                                <Sparkles size={100} className="text-brand-teal"/>
                             </div>
                         </div>
                     )}
@@ -180,7 +181,7 @@ export const ApproverDashboard = () => {
                     {selectedRequest.status !== RequestStatus.AUTHORIZED && (
                         <div className="flex items-center justify-between border-b pb-4">
                             <h3 className="text-2xl font-bold text-gray-900">{selectedRequest.vendorName}</h3>
-                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${selectedRequest.status === RequestStatus.APPROVED ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${selectedRequest.status === RequestStatus.APPROVED ? 'bg-brand-teal/10 text-brand-teal' : 'bg-brand-orange/10 text-brand-orange'}`}>
                                 {selectedRequest.status}
                             </span>
                         </div>
@@ -191,7 +192,7 @@ export const ApproverDashboard = () => {
                          <div className="space-y-1">
                              <span className="text-gray-500">Authorized By</span>
                              <div className="font-medium flex items-center">
-                                 <CheckCircle size={14} className="text-green-500 mr-1"/>
+                                 <CheckCircle size={14} className="text-brand-teal mr-1"/>
                                  Admin / Authorizer (ID: {selectedRequest.authorizerId})
                              </div>
                          </div>
@@ -210,7 +211,7 @@ export const ApproverDashboard = () => {
                                     <button 
                                       key={i} 
                                       onClick={() => setPreviewFile(f)}
-                                      className="flex items-center space-x-2 text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-md border border-indigo-100 hover:bg-indigo-100 transition-colors"
+                                      className="flex items-center space-x-2 text-xs bg-brand-teal/5 text-brand-teal px-3 py-2 rounded-md border border-brand-teal/20 hover:bg-brand-teal/10 transition-colors"
                                     >
                                         <FileText size={14}/>
                                         <span className="font-medium">{f.name}</span>
@@ -236,22 +237,22 @@ export const ApproverDashboard = () => {
                         {selectedRequest.status === RequestStatus.AUTHORIZED ? (
                             !action ? (
                                 <div className="flex justify-end space-x-4">
-                                    <button onClick={() => setAction('REJECT')} className="px-6 py-2.5 border border-red-200 text-red-700 rounded-lg hover:bg-red-50 font-medium transition-colors flex items-center">
+                                    <button onClick={() => setAction('REJECT')} className="px-6 py-2.5 border border-red-200 text-brand-orange rounded-lg hover:bg-red-50 font-medium transition-colors flex items-center">
                                         <XCircle size={18} className="mr-2"/> Reject
                                     </button>
-                                    <button onClick={() => setAction('APPROVE')} className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-md transition-colors flex items-center">
+                                    <button onClick={() => setAction('APPROVE')} className="px-6 py-2.5 bg-brand-teal text-white rounded-lg hover:bg-[#008f7a] font-medium shadow-md transition-colors flex items-center">
                                         <CheckCircle size={18} className="mr-2"/> Approve Request
                                     </button>
                                 </div>
                             ) : (
                                 <div className="animate-in fade-in zoom-in-95 bg-gray-50 p-4 rounded-lg">
-                                    <h4 className={`font-bold mb-2 ${action === 'APPROVE' ? 'text-blue-800' : 'text-red-800'}`}>
+                                    <h4 className={`font-bold mb-2 ${action === 'APPROVE' ? 'text-brand-teal' : 'text-brand-orange'}`}>
                                         {action === 'APPROVE' ? 'Confirm Approval' : 'Rejection Remarks'}
                                     </h4>
                                     
                                     {action === 'REJECT' && (
                                         <textarea 
-                                            className="w-full border border-gray-300 rounded p-2 mb-3 focus:ring-2 focus:ring-red-500"
+                                            className="w-full border border-gray-300 rounded p-2 mb-3 focus:ring-2 focus:ring-brand-orange"
                                             placeholder="Reason for rejection..."
                                             value={remarks}
                                             onChange={e => setRemarks(e.target.value)}
@@ -263,7 +264,7 @@ export const ApproverDashboard = () => {
 
                                     <div className="flex justify-end space-x-3">
                                         <button onClick={() => { setAction(null); setRemarks(''); }} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">Cancel</button>
-                                        <button onClick={handleFinish} className={`px-6 py-2 rounded-lg text-white font-medium ${action === 'APPROVE' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-red-600 hover:bg-red-700'}`}>
+                                        <button onClick={handleFinish} className={`px-6 py-2 rounded-lg text-white font-medium ${action === 'APPROVE' ? 'bg-brand-teal hover:bg-[#008f7a]' : 'bg-brand-orange hover:bg-[#d63a10]'}`}>
                                             Confirm
                                         </button>
                                     </div>
@@ -310,7 +311,7 @@ export const ApproverDashboard = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{req.vendorName}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{req.currency} {req.amount.toLocaleString()}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${req.status === RequestStatus.APPROVED ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${req.status === RequestStatus.APPROVED ? 'bg-brand-teal/10 text-brand-teal' : 'bg-brand-orange/10 text-brand-orange'}`}>
                                     {req.status === RequestStatus.APPROVED ? 'Approved' : 'Rejected'}
                                 </span>
                             </td>
@@ -320,7 +321,7 @@ export const ApproverDashboard = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <button 
                                     onClick={() => setSelectedRequest(req)}
-                                    className="text-blue-600 hover:text-blue-800 flex items-center space-x-1"
+                                    className="text-brand-dark hover:text-brand-teal flex items-center space-x-1"
                                 >
                                     <Eye size={16} />
                                     <span>View</span>
@@ -339,8 +340,8 @@ export const ApproverDashboard = () => {
           <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-[85vh] flex flex-col animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center p-4 border-b">
               <div className="flex items-center space-x-3">
-                <div className="bg-blue-100 p-2 rounded">
-                  <FileText size={20} className="text-blue-600"/>
+                <div className="bg-brand-teal/10 p-2 rounded">
+                  <FileText size={20} className="text-brand-teal"/>
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900">{previewFile.name}</h3>
@@ -391,7 +392,7 @@ export const ApproverDashboard = () => {
             <div className="p-4 border-t bg-gray-50 flex justify-end">
               <button 
                 onClick={() => handleDownload(previewFile)}
-                className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
+                className="flex items-center space-x-2 bg-brand-teal hover:bg-[#008f7a] text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
               >
                 <Download size={18} />
                 <span>Download File</span>

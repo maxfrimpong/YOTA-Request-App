@@ -69,21 +69,21 @@ export const ChatWidget = () => {
         <div className="bg-white border border-gray-200 shadow-2xl rounded-2xl w-80 md:w-96 h-[500px] mb-4 flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200">
           
           {/* Header */}
-          <div className="bg-slate-900 p-4 text-white flex justify-between items-center shadow-md shrink-0">
+          <div className="bg-brand-dark p-4 text-white flex justify-between items-center shadow-md shrink-0">
             {activeChatUser ? (
               <div className="flex items-center space-x-2">
-                <button onClick={() => setActiveChatUser(null)} className="hover:bg-slate-700 p-1 rounded-full">
+                <button onClick={() => setActiveChatUser(null)} className="hover:bg-white/10 p-1 rounded-full">
                   <ChevronLeft size={20} />
                 </button>
                 <div>
                    <h3 className="font-bold text-sm">{activeChatUser.name}</h3>
-                   <p className="text-xs text-slate-300">{activeChatUser.department}</p>
+                   <p className="text-xs text-brand-teal">{activeChatUser.department}</p>
                 </div>
               </div>
             ) : (
               <h3 className="font-bold">Team Chat</h3>
             )}
-            <button onClick={() => setIsOpen(false)} className="hover:bg-slate-700 p-1 rounded-full">
+            <button onClick={() => setIsOpen(false)} className="hover:bg-white/10 p-1 rounded-full">
               <X size={20} />
             </button>
           </div>
@@ -99,7 +99,7 @@ export const ChatWidget = () => {
                         <input 
                             type="text" 
                             placeholder="Search colleagues..."
-                            className="w-full bg-gray-100 rounded-full pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="w-full bg-gray-100 rounded-full pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-teal"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -115,11 +115,11 @@ export const ChatWidget = () => {
                             className="p-3 hover:bg-white cursor-pointer transition-colors flex items-center space-x-3"
                             >
                             <div className="relative">
-                                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border-2 border-white shadow-sm">
+                                <div className="h-10 w-10 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal font-bold border-2 border-white shadow-sm">
                                 {u.name.charAt(0)}
                                 </div>
                                 {unreadCounts[u.id] > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] h-4 w-4 flex items-center justify-center rounded-full border border-white">
+                                <span className="absolute -top-1 -right-1 bg-brand-orange text-white text-[10px] h-4 w-4 flex items-center justify-center rounded-full border border-white">
                                     {unreadCounts[u.id]}
                                 </span>
                                 )}
@@ -156,11 +156,11 @@ export const ChatWidget = () => {
                                <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                                    <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm ${
                                        isMe 
-                                        ? 'bg-blue-600 text-white rounded-br-none' 
+                                        ? 'bg-brand-teal text-white rounded-br-none' 
                                         : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none'
                                    }`}>
                                        <p>{msg.content}</p>
-                                       <p className={`text-[10px] mt-1 text-right ${isMe ? 'text-blue-200' : 'text-gray-400'}`}>
+                                       <p className={`text-[10px] mt-1 text-right ${isMe ? 'text-blue-100' : 'text-gray-400'}`}>
                                            {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                        </p>
                                    </div>
@@ -177,12 +177,12 @@ export const ChatWidget = () => {
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                         placeholder="Type a message..."
-                        className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+                        className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-teal focus:bg-white transition-all"
                     />
                     <button 
                         type="submit" 
                         disabled={!inputText.trim()}
-                        className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="bg-brand-teal text-white p-2 rounded-full hover:bg-[#008f7a] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                         <Send size={18} />
                     </button>
@@ -196,11 +196,11 @@ export const ChatWidget = () => {
       {/* Floating Button */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="h-14 w-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 relative"
+        className="h-14 w-14 rounded-full bg-brand-teal hover:bg-[#008f7a] text-white shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 relative"
       >
          {isOpen ? <X size={28} /> : <MessageSquare size={28} />}
          {!isOpen && totalUnread > 0 && (
-            <span className="absolute -top-1 -right-1 h-6 w-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white animate-bounce">
+            <span className="absolute -top-1 -right-1 h-6 w-6 bg-brand-orange text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white animate-bounce">
                 {totalUnread}
             </span>
          )}

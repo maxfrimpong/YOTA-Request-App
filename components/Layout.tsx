@@ -39,7 +39,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       <div className="flex justify-between items-center p-3 border-b bg-gray-50 rounded-t-lg">
         <h3 className="font-semibold text-gray-700 text-sm">Notifications</h3>
         {unreadCount > 0 && (
-          <button onClick={markAllAsRead} className="text-xs text-blue-600 hover:text-blue-800">
+          <button onClick={markAllAsRead} className="text-xs text-brand-teal hover:text-brand-dark">
             Mark all read
           </button>
         )}
@@ -52,10 +52,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <div 
               key={notification.id} 
               onClick={() => markAsRead(notification.id)}
-              className={`p-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors ${!notification.isRead ? 'bg-blue-50/50' : ''}`}
+              className={`p-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors ${!notification.isRead ? 'bg-brand-teal/5' : ''}`}
             >
               <div className="flex gap-3">
-                <div className={`mt-1 h-2 w-2 rounded-full flex-shrink-0 ${!notification.isRead ? 'bg-blue-500' : 'bg-transparent'}`} />
+                <div className={`mt-1 h-2 w-2 rounded-full flex-shrink-0 ${!notification.isRead ? 'bg-brand-orange' : 'bg-transparent'}`} />
                 <div>
                    <p className={`text-sm ${!notification.isRead ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
                      {notification.message}
@@ -75,24 +75,24 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 text-white flex-shrink-0 hidden md:flex flex-col">
-        <div className="p-6 border-b border-slate-700">
-          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-teal-400">
+      <aside className="w-64 bg-brand-dark text-white flex-shrink-0 hidden md:flex flex-col">
+        <div className="p-6 border-b border-white/10">
+          <h1 className="text-2xl font-bold text-white">
             PayFlow
           </h1>
-          <p className="text-slate-400 text-xs mt-1">Cash Payment System</p>
+          <p className="text-brand-teal text-xs mt-1">Cash Payment System</p>
         </div>
 
         {/* Role Switcher if applicable */}
         {user.roles.length > 1 && (
-           <div className="px-6 py-4 bg-slate-800/50 border-b border-slate-700">
-              <label className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-2 block flex items-center gap-1">
+           <div className="px-6 py-4 bg-black/20 border-b border-white/10">
+              <label className="text-xs text-brand-teal font-semibold uppercase tracking-wider mb-2 block flex items-center gap-1">
                  <RefreshCw size={10} /> Switch View
               </label>
               <select 
                 value={activeRole}
                 onChange={(e) => switchRole(e.target.value as Role)}
-                className="w-full bg-slate-900 text-white text-xs border border-slate-600 rounded p-2 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                className="w-full bg-brand-dark text-white text-xs border border-white/20 rounded p-2 focus:ring-1 focus:ring-brand-teal focus:outline-none"
               >
                   {user.roles.map(r => (
                       <option key={r} value={r}>{r.replace('_', ' ')}</option>
@@ -108,8 +108,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               to={item.path}
               className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                 location.pathname === item.path
-                  ? 'bg-blue-600 text-white'
-                  : 'text-slate-300 hover:bg-slate-800'
+                  ? 'bg-brand-teal text-white shadow-lg'
+                  : 'text-gray-300 hover:bg-white/10 hover:text-white'
               }`}
             >
               <item.icon size={20} />
@@ -118,10 +118,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-slate-700">
+        <div className="p-4 border-t border-white/10">
           <button
             onClick={logout}
-            className="w-full flex items-center justify-center space-x-2 bg-slate-800 hover:bg-slate-700 py-2 rounded-md text-sm transition-colors"
+            className="w-full flex items-center justify-center space-x-2 bg-black/20 hover:bg-black/40 py-2 rounded-md text-sm transition-colors text-gray-300 hover:text-white"
           >
             <LogOut size={16} />
             <span>Sign Out</span>
@@ -150,7 +150,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                       >
                           <Bell size={20} />
                           {unreadCount > 0 && (
-                            <span className="absolute top-1 right-1 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                            <span className="absolute top-1 right-1 h-2.5 w-2.5 bg-brand-orange rounded-full border-2 border-white"></span>
                           )}
                       </button>
                       {showNotifications && <NotificationPanel />}
@@ -162,7 +162,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                         <p className="text-sm font-bold text-gray-800">{user.name}</p>
                         <p className="text-xs text-gray-500">{user.department}</p>
                      </div>
-                     <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border-2 border-white shadow-sm">
+                     <div className="w-9 h-9 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal font-bold border-2 border-white shadow-sm">
                         {user.name.charAt(0)}
                      </div>
                   </Link>
@@ -170,42 +170,47 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           </header>
 
           {/* Mobile Header */}
-          <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-slate-900 z-50 flex items-center justify-between px-4 shadow-md">
+          <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-brand-dark z-50 flex items-center justify-between px-4 shadow-md">
             <div className="flex items-center space-x-2">
                 <Link to="/" className="text-xl font-bold text-white">PayFlow</Link>
                 {user.roles.length > 1 && (
-                    <span className="text-xs bg-slate-800 text-slate-300 px-2 py-1 rounded border border-slate-700">
+                    <span className="text-xs bg-black/20 text-brand-teal px-2 py-1 rounded border border-white/10">
                         {activeRole.replace('_', ' ')}
                     </span>
                 )}
             </div>
             <div className="flex items-center gap-3">
-                <Link to="/profile" className="text-slate-300 hover:text-white">
+                <Link to="/profile" className="text-gray-300 hover:text-white">
                     <UserIcon size={20} />
                 </Link>
                 <div className="relative" ref={notificationRef}>
                       <button 
                         onClick={() => setShowNotifications(!showNotifications)}
-                        className="relative p-2 text-slate-300 hover:bg-slate-800 rounded-full transition-colors"
+                        className="relative p-2 text-gray-300 hover:bg-white/10 rounded-full transition-colors"
                       >
                           <Bell size={20} />
                           {unreadCount > 0 && (
-                            <span className="absolute top-1 right-1 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-slate-900"></span>
+                            <span className="absolute top-1 right-1 h-2.5 w-2.5 bg-brand-orange rounded-full border-2 border-brand-dark"></span>
                           )}
                       </button>
                       {showNotifications && <NotificationPanel />}
                 </div>
-                <button onClick={logout} className="text-slate-300">
+                <button onClick={logout} className="text-gray-300">
                    <LogOut size={20} />
                 </button>
             </div>
           </div>
 
           {/* Main Content Area */}
-          <main className="flex-1 overflow-auto md:pt-0 pt-16 bg-gray-50 relative">
-            <div className="max-w-7xl mx-auto p-4 md:p-8">
+          <main className="flex-1 overflow-auto md:pt-0 pt-16 bg-gray-50 relative flex flex-col">
+            <div className="max-w-7xl mx-auto p-4 md:p-8 w-full flex-grow">
               {children}
             </div>
+            <footer className="py-6 text-center border-t border-gray-200/50 mt-auto bg-gray-50/50">
+                <p className="text-xs text-gray-400">
+                    &copy; {new Date().getFullYear()} PayFlow. Custom developed for <span className="font-semibold text-brand-dark">YOTA - Youth Opportunity and Transformation in Africa</span>.
+                </p>
+            </footer>
           </main>
 
           {/* Chat Widget */}

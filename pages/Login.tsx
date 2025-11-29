@@ -27,12 +27,12 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-brand-dark flex flex-col items-center justify-center p-4">
       <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-teal-400">
+        <h1 className="text-4xl font-bold text-white mb-2">
             PayFlow
         </h1>
-        <p className="text-slate-400">Secure Payment Request System</p>
+        <p className="text-brand-teal">Secure Payment Request System</p>
       </div>
       
       <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md">
@@ -47,7 +47,7 @@ export const Login = () => {
               id="email"
               type="email"
               required
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
               placeholder="you@org.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -62,18 +62,18 @@ export const Login = () => {
               id="password"
               type="password"
               required
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <p className="text-brand-orange text-sm">{error}</p>}
 
           <button
             type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-teal hover:bg-[#008f7a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-teal transition-colors"
           >
             Sign In
           </button>

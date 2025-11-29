@@ -76,7 +76,7 @@ export const AdminDashboard = () => {
   });
   const statusData = Object.keys(statusDataMap).map(key => ({ name: key, count: statusDataMap[key] }));
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+  const COLORS = ['#00a88f', '#006680', '#fa4515', '#ffc658', '#82ca9d'];
 
   const openAddUserModal = () => {
     setEditingUserId(null);
@@ -155,14 +155,14 @@ export const AdminDashboard = () => {
         <div className="flex bg-gray-200 p-1 rounded-lg self-start">
             <button 
                 onClick={() => setActiveTab('overview')}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'overview' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'overview' ? 'bg-white text-brand-teal shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
             >
                 <LayoutDashboard size={16} />
                 <span>Overview</span>
             </button>
             <button 
                 onClick={() => setActiveTab('users')}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'users' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'users' ? 'bg-white text-brand-teal shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
             >
                 <Users size={16} />
                 <span>User Management</span>
@@ -184,7 +184,7 @@ export const AdminDashboard = () => {
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                     <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider">Approved</h3>
-                    <p className="text-3xl font-bold text-green-600 mt-2">{approvedCount}</p>
+                    <p className="text-3xl font-bold text-brand-teal mt-2">{approvedCount}</p>
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                     <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider">Pending</h3>
@@ -227,7 +227,7 @@ export const AdminDashboard = () => {
                             <YAxis allowDecimals={false} />
                             <Tooltip />
                             <Legend />
-                            <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="count" fill="#006680" radius={[4, 4, 0, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
@@ -268,7 +268,7 @@ export const AdminDashboard = () => {
                  <h3 className="text-lg font-bold text-gray-800">User Directory</h3>
                  <button 
                     onClick={openAddUserModal}
-                    className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
+                    className="flex items-center space-x-2 bg-brand-teal hover:bg-[#008f7a] text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
                  >
                      <UserPlus size={18} />
                      <span>Add New User</span>
@@ -291,7 +291,7 @@ export const AdminDashboard = () => {
                             <tr key={u.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center">
-                                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold mr-3">
+                                        <div className="h-10 w-10 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal font-bold mr-3">
                                             {u.name.charAt(0)}
                                         </div>
                                         <div>
@@ -306,7 +306,7 @@ export const AdminDashboard = () => {
                                             <span key={r} className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
                                                 ${r === Role.ADMIN ? 'bg-purple-100 text-purple-800' : 
                                                 r === Role.APPROVER ? 'bg-indigo-100 text-indigo-800' :
-                                                r === Role.AUTHORIZER ? 'bg-blue-100 text-blue-800' : 
+                                                r === Role.AUTHORIZER ? 'bg-brand-dark/10 text-brand-dark' : 
                                                 'bg-gray-100 text-gray-800'}`}>
                                                 {r.replace('_', ' ')}
                                             </span>
@@ -318,7 +318,7 @@ export const AdminDashboard = () => {
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <button 
                                         onClick={() => openEditUserModal(u)}
-                                        className="text-blue-600 hover:text-blue-900 flex items-center justify-end w-full"
+                                        className="text-brand-dark hover:text-brand-teal flex items-center justify-end w-full"
                                     >
                                         <Edit2 size={16} className="mr-1" /> Edit
                                     </button>
@@ -349,7 +349,7 @@ export const AdminDashboard = () => {
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <Users size={16} className="text-gray-400" />
                             </div>
-                            <input required type="text" className="pl-10 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            <input required type="text" className="pl-10 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
                                 value={newName} onChange={e => setNewName(e.target.value)} placeholder="e.g. John Doe" />
                         </div>
                     </div>
@@ -360,7 +360,7 @@ export const AdminDashboard = () => {
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <Mail size={16} className="text-gray-400" />
                             </div>
-                            <input required type="email" className="pl-10 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            <input required type="email" className="pl-10 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
                                 value={newEmail} onChange={e => setNewEmail(e.target.value)} placeholder="user@organization.com" />
                         </div>
                     </div>
@@ -374,7 +374,7 @@ export const AdminDashboard = () => {
                                 </div>
                                 <select 
                                     required
-                                    className="pl-10 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-sm"
+                                    className="pl-10 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal bg-white text-sm"
                                     value={newDepartment} 
                                     onChange={e => setNewDepartment(e.target.value)} 
                                 >
@@ -389,7 +389,7 @@ export const AdminDashboard = () => {
                             <label className="block text-sm font-medium text-gray-700 mb-1">Position</label>
                             <select 
                                 required
-                                className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-sm"
+                                className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal bg-white text-sm"
                                 value={newPosition} 
                                 onChange={e => setNewPosition(e.target.value)} 
                             >
@@ -408,7 +408,7 @@ export const AdminDashboard = () => {
                                  <label key={role} className="flex items-center space-x-3 cursor-pointer">
                                      <input 
                                         type="checkbox" 
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        className="h-4 w-4 text-brand-teal focus:ring-brand-teal border-gray-300 rounded"
                                         checked={newRoles.includes(role)}
                                         onChange={() => toggleRole(role)}
                                      />
@@ -437,7 +437,7 @@ export const AdminDashboard = () => {
                             <input 
                                 required={!editingUserId} 
                                 type="text" 
-                                className="pl-10 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono"
+                                className="pl-10 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal font-mono"
                                 value={newPassword} 
                                 onChange={e => setNewPassword(e.target.value)} 
                                 placeholder={editingUserId ? "Leave empty to keep current" : "Enter temp password"} 
@@ -447,7 +447,7 @@ export const AdminDashboard = () => {
 
                     <div className="flex justify-end space-x-3 pt-4 border-t mt-2">
                         <button type="button" onClick={() => setIsUserModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-300 rounded-md hover:bg-gray-100">Cancel</button>
-                        <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 shadow-sm">
+                        <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-brand-teal rounded-md hover:bg-[#008f7a] shadow-sm">
                             {editingUserId ? 'Update User' : 'Create User'}
                         </button>
                     </div>

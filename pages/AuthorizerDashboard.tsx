@@ -77,7 +77,7 @@ export const AuthorizerDashboard = () => {
                         </div>
                         <button 
                             onClick={() => setSelectedRequest(req)}
-                            className="bg-blue-50 text-blue-600 px-3 py-1.5 rounded text-sm font-medium hover:bg-blue-100"
+                            className="bg-brand-dark/10 text-brand-dark px-3 py-1.5 rounded text-sm font-medium hover:bg-brand-dark/20"
                         >
                             Review
                         </button>
@@ -100,14 +100,14 @@ export const AuthorizerDashboard = () => {
                         <div>
                            <h3 className="text-xl font-bold text-gray-900">{selectedRequest.vendorName}</h3>
                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1
-                                ${selectedRequest.status === RequestStatus.AUTHORIZED ? 'bg-blue-100 text-blue-800' : 
-                                  selectedRequest.status === RequestStatus.APPROVED ? 'bg-green-100 text-green-800' : 
+                                ${selectedRequest.status === RequestStatus.AUTHORIZED ? 'bg-brand-dark/10 text-brand-dark' : 
+                                  selectedRequest.status === RequestStatus.APPROVED ? 'bg-brand-teal/10 text-brand-teal' : 
                                   selectedRequest.status === RequestStatus.PENDING_AUTHORIZATION ? 'bg-yellow-100 text-yellow-800' :
-                                  'bg-red-100 text-red-800'}`}>
+                                  'bg-brand-orange/10 text-brand-orange'}`}>
                                 {selectedRequest.status}
                            </span>
                         </div>
-                        <span className="text-2xl font-bold text-blue-600">{selectedRequest.currency} {selectedRequest.amount.toLocaleString()}</span>
+                        <span className="text-2xl font-bold text-brand-dark">{selectedRequest.currency} {selectedRequest.amount.toLocaleString()}</span>
                     </div>
 
                     <div className="space-y-4 mb-8">
@@ -147,7 +147,7 @@ export const AuthorizerDashboard = () => {
                                     <button 
                                       key={i} 
                                       onClick={() => setPreviewFile(f)}
-                                      className="flex items-center space-x-2 text-xs bg-blue-50 text-blue-700 px-3 py-2 rounded-md border border-blue-100 hover:bg-blue-100 transition-colors"
+                                      className="flex items-center space-x-2 text-xs bg-brand-teal/5 text-brand-teal px-3 py-2 rounded-md border border-brand-teal/20 hover:bg-brand-teal/10 transition-colors"
                                     >
                                         <FileText size={14}/>
                                         <span className="font-medium">{f.name}</span>
@@ -162,13 +162,13 @@ export const AuthorizerDashboard = () => {
                         {selectedRequest.status === RequestStatus.PENDING_AUTHORIZATION ? (
                             !action ? (
                                 <div className="flex space-x-3">
-                                    <button onClick={() => setAction('AUTHORIZE')} className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-medium transition-colors flex justify-center items-center">
+                                    <button onClick={() => setAction('AUTHORIZE')} className="flex-1 bg-brand-teal hover:bg-[#008f7a] text-white py-2 rounded-lg font-medium transition-colors flex justify-center items-center">
                                         <CheckCircle size={18} className="mr-2"/> Authorize
                                     </button>
-                                    <button onClick={() => setAction('FREEZE')} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-medium transition-colors flex justify-center items-center">
+                                    <button onClick={() => setAction('FREEZE')} className="flex-1 bg-orange-400 hover:bg-orange-500 text-white py-2 rounded-lg font-medium transition-colors flex justify-center items-center">
                                         <AlertTriangle size={18} className="mr-2"/> Freeze
                                     </button>
-                                    <button onClick={() => setAction('REJECT')} className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-medium transition-colors flex justify-center items-center">
+                                    <button onClick={() => setAction('REJECT')} className="flex-1 bg-brand-orange hover:bg-[#d63a10] text-white py-2 rounded-lg font-medium transition-colors flex justify-center items-center">
                                         <XCircle size={18} className="mr-2"/> Reject
                                     </button>
                                 </div>
@@ -181,7 +181,7 @@ export const AuthorizerDashboard = () => {
                                     
                                     {action !== 'AUTHORIZE' && (
                                         <textarea 
-                                            className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-brand-teal focus:border-brand-teal"
                                             placeholder="Add remarks for the requester..."
                                             rows={3}
                                             value={remarks}
@@ -194,8 +194,8 @@ export const AuthorizerDashboard = () => {
                                     <div className="flex space-x-3">
                                         <button onClick={() => { setAction(null); setRemarks(''); }} className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg font-medium">Cancel</button>
                                         <button onClick={handleAction} className={`flex-1 text-white py-2 rounded-lg font-medium 
-                                            ${action === 'AUTHORIZE' ? 'bg-green-600 hover:bg-green-700' : 
-                                            action === 'FREEZE' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-red-600 hover:bg-red-700'}`}>
+                                            ${action === 'AUTHORIZE' ? 'bg-brand-teal hover:bg-[#008f7a]' : 
+                                            action === 'FREEZE' ? 'bg-orange-400 hover:bg-orange-500' : 'bg-brand-orange hover:bg-[#d63a10]'}`}>
                                             Confirm
                                         </button>
                                     </div>
@@ -238,9 +238,9 @@ export const AuthorizerDashboard = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{req.currency} {req.amount.toLocaleString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                             <span className={`px-2 py-1 rounded-full text-xs font-medium 
-                                ${req.status === RequestStatus.AUTHORIZED ? 'bg-blue-100 text-blue-800' : 
-                                  req.status === RequestStatus.APPROVED ? 'bg-green-100 text-green-800' : 
-                                  'bg-red-100 text-red-800'}`}>
+                                ${req.status === RequestStatus.AUTHORIZED ? 'bg-brand-dark/10 text-brand-dark' : 
+                                  req.status === RequestStatus.APPROVED ? 'bg-brand-teal/10 text-brand-teal' : 
+                                  'bg-brand-orange/10 text-brand-orange'}`}>
                                 {req.status}
                             </span>
                         </td>
@@ -250,7 +250,7 @@ export const AuthorizerDashboard = () => {
                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <button 
                                 onClick={() => setSelectedRequest(req)}
-                                className="text-blue-600 hover:text-blue-800 flex items-center space-x-1"
+                                className="text-brand-dark hover:text-brand-teal flex items-center space-x-1"
                             >
                                 <Eye size={16} />
                                 <span>View</span>
@@ -268,8 +268,8 @@ export const AuthorizerDashboard = () => {
           <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-[85vh] flex flex-col animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center p-4 border-b">
               <div className="flex items-center space-x-3">
-                <div className="bg-blue-100 p-2 rounded">
-                  <FileText size={20} className="text-blue-600"/>
+                <div className="bg-brand-teal/10 p-2 rounded">
+                  <FileText size={20} className="text-brand-teal"/>
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900">{previewFile.name}</h3>
@@ -320,7 +320,7 @@ export const AuthorizerDashboard = () => {
             <div className="p-4 border-t bg-gray-50 flex justify-end">
               <button 
                 onClick={() => handleDownload(previewFile)}
-                className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
+                className="flex items-center space-x-2 bg-brand-teal hover:bg-[#008f7a] text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
               >
                 <Download size={18} />
                 <span>Download File</span>
