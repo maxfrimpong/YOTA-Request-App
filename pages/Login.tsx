@@ -32,7 +32,7 @@ export const Login = () => {
       <div className="w-full flex-1 flex flex-col items-center justify-center">
           <div className="mb-8 text-center">
             <h1 className="text-4xl font-bold text-white mb-2">
-                PayFlow
+                SendREQ
             </h1>
             <p className="text-brand-teal">YOTA Payment Request System</p>
           </div>
@@ -104,7 +104,7 @@ export const Login = () => {
       {/* Copyright Footer */}
       <footer className="py-6 text-center">
         <p className="text-xs text-gray-400">
-            &copy; {new Date().getFullYear()} PayFlow. Custom developed for <span className="font-semibold text-brand-teal">YOTA - Youth Opportunity and Transformation in Africa</span>.
+            &copy; {new Date().getFullYear()} SendREQ. Custom developed for <span className="font-semibold text-brand-teal">YOTA - Youth Opportunity and Transformation in Africa</span>.
         </p>
       </footer>
     </div>

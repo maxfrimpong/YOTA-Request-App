@@ -14,7 +14,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   
   // Simulate persistent login for demo smoothness
   useEffect(() => {
-    const storedUserId = localStorage.getItem('payflow_user_id');
+    const storedUserId = localStorage.getItem('sendreq_user_id');
     if (storedUserId) {
       const found = users.find(u => u.id === storedUserId);
       if (found) {
@@ -36,7 +36,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       setUser(foundUser);
       // Set initial active role to the first one assigned
       setActiveRole(foundUser.roles.length > 0 ? foundUser.roles[0] : Role.STAFF);
-      localStorage.setItem('payflow_user_id', foundUser.id);
+      localStorage.setItem('sendreq_user_id', foundUser.id);
       return true;
     }
     return false;
@@ -45,7 +45,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     setUser(null);
     setActiveRole(null);
-    localStorage.removeItem('payflow_user_id');
+    localStorage.removeItem('sendreq_user_id');
   };
 
   const switchRole = (role: Role) => {

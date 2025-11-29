@@ -1,5 +1,5 @@
 {
-  "name": "payflow---cash-payment-requests",
+  "name": "sendreq---cash-payment-requests",
   "private": true,
   "version": "0.0.0",
   "type": "module",

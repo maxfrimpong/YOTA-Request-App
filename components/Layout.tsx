@@ -78,7 +78,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       <aside className="w-64 bg-brand-dark text-white flex-shrink-0 hidden md:flex flex-col">
         <div className="p-6 border-b border-white/10">
           <h1 className="text-2xl font-bold text-white">
-            PayFlow
+            SendREQ
           </h1>
           <p className="text-brand-teal text-xs mt-1">YOTA Payment Request System</p>
         </div>
@@ -172,7 +172,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           {/* Mobile Header */}
           <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-brand-dark z-50 flex items-center justify-between px-4 shadow-md">
             <div className="flex items-center space-x-2">
-                <Link to="/" className="text-xl font-bold text-white">PayFlow</Link>
+                <Link to="/" className="text-xl font-bold text-white">SendREQ</Link>
                 {user.roles.length > 1 && (
                     <span className="text-xs bg-black/20 text-brand-teal px-2 py-1 rounded border border-white/10">
                         {activeRole.replace('_', ' ')}
@@ -208,7 +208,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             </div>
             <footer className="py-6 text-center border-t border-gray-200/50 mt-auto bg-gray-50/50">
                 <p className="text-xs text-gray-400">
-                    &copy; {new Date().getFullYear()} PayFlow. Custom developed for <span className="font-semibold text-brand-dark">YOTA - Youth Opportunity and Transformation in Africa</span>.
+                    &copy; {new Date().getFullYear()} SendREQ. Custom developed for <span className="font-semibold text-brand-dark">YOTA - Youth Opportunity and Transformation in Africa</span>.
                 </p>
             </footer>
           </main>
