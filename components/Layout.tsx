@@ -6,7 +6,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { ChatWidget } from './ChatWidget';
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
-  const { user, activeRole, switchRole, logout, notifications, markAsRead, markAllAsRead } = useApp();
+  const { user, activeRole, switchRole, logout, notifications, markAsRead, markAllAsRead, logoUrl } = useApp();
   const location = useLocation();
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -77,13 +77,13 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       {/* Sidebar */}
       <aside className="w-64 bg-brand-dark text-white flex-shrink-0 hidden md:flex flex-col">
         <div className="p-6 border-b border-white/10 flex flex-col">
-          <div className="bg-white p-3 rounded-lg w-full flex items-center justify-center mb-4 shadow-sm">
-             <img src="https://aistudiocdn.com/uploads/1c521369-0260-496e-a3b0-45d2729a35e8.png" alt="YOTA Logo" className="h-10 w-auto object-contain" />
+          <div className="bg-white p-3 rounded-lg w-full flex items-center justify-center mb-4 shadow-sm h-20">
+             <img src={logoUrl} alt="Organization Logo" className="max-h-full max-w-full object-contain" />
           </div>
           <h1 className="text-xl font-bold text-white pl-1">
             SendREQ
           </h1>
-          <p className="text-brand-teal text-xs mt-1 pl-1">Payment Request System</p>
+          <p className="text-brand-teal text-xs mt-1 pl-1">YOTA Payment Request System</p>
         </div>
 
         {/* Role Switcher if applicable */}
@@ -175,12 +175,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           {/* Mobile Header */}
           <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-brand-dark z-50 flex items-center justify-between px-4 shadow-md">
             <div className="flex items-center space-x-2">
-                <Link to="/" className="text-xl font-bold text-white">SendREQ</Link>
-                {user.roles.length > 1 && (
-                    <span className="text-xs bg-black/20 text-brand-teal px-2 py-1 rounded border border-white/10">
-                        {activeRole.replace('_', ' ')}
-                    </span>
-                )}
+                <div className="bg-white p-1 rounded h-10 w-24 flex items-center justify-center">
+                   <img src={logoUrl} alt="Logo" className="max-h-full max-w-full object-contain" />
+                </div>
             </div>
             <div className="flex items-center gap-3">
                 <Link to="/profile" className="text-gray-300 hover:text-white">

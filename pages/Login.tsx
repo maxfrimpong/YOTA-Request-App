@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 
 export const Login = () => {
-  const { login, user } = useApp();
+  const { login, user, logoUrl } = useApp();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,9 +31,6 @@ export const Login = () => {
       {/* Main Content Wrapper to center form */}
       <div className="w-full flex-1 flex flex-col items-center justify-center">
           <div className="mb-8 text-center flex flex-col items-center">
-            <div className="bg-white p-4 rounded-xl mb-6 shadow-lg">
-                <img src="https://aistudiocdn.com/uploads/1c521369-0260-496e-a3b0-45d2729a35e8.png" alt="YOTA Logo" className="h-16 w-auto object-contain" />
-            </div>
             <h1 className="text-4xl font-bold text-white mb-2">
                 SendREQ
             </h1>

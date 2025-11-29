@@ -75,6 +75,7 @@ export interface AuthContextType {
   requests: PaymentRequest[];
   notifications: Notification[];
   messages: ChatMessage[];
+  logoUrl: string;
   login: (email: string, password: string) => boolean;
   logout: () => void;
   switchRole: (role: Role) => void;
@@ -86,4 +87,5 @@ export interface AuthContextType {
   markAllAsRead: () => void;
   sendMessage: (receiverId: string, content: string) => void;
   markChatAsRead: (senderId: string) => void;
+  updateLogo: (url: string) => void;
 }

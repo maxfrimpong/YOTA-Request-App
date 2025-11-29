@@ -11,8 +11,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [users, setUsers] = useState<User[]>(MOCK_USERS);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>(MOCK_MESSAGES);
+  const [logoUrl, setLogoUrl] = useState<string>('logo.png');
   
-  // Simulate persistent login for demo smoothness
+  // Simulate persistent login and logo for demo smoothness
   useEffect(() => {
     const storedUserId = localStorage.getItem('sendreq_user_id');
     if (storedUserId) {
@@ -24,6 +25,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             setActiveRole(found.roles[0]);
         }
       }
+    }
+    
+    const storedLogo = localStorage.getItem('sendreq_logo');
+    if (storedLogo) {
+        setLogoUrl(storedLogo);
     }
   }, [users]);
 
@@ -52,6 +58,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     if (user && user.roles.includes(role)) {
       setActiveRole(role);
     }
+  };
+
+  const updateLogo = (url: string) => {
+      setLogoUrl(url);
+      localStorage.setItem('sendreq_logo', url);
   };
 
   const createNotification = (userId: string, message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') => {
@@ -211,9 +222,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AppContext.Provider value={{ 
-      user, activeRole, users, requests, notifications, messages,
+      user, activeRole, users, requests, notifications, messages, logoUrl,
       login, logout, switchRole, addRequest, updateRequestStatus, addUser, editUser,
-      markAsRead, markAllAsRead, sendMessage, markChatAsRead
+      markAsRead, markAllAsRead, sendMessage, markChatAsRead, updateLogo
     }}>
       {children}
     </AppContext.Provider>

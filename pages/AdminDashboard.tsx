@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { RequestStatus, Role, User } from '../types';
-import { Users, LayoutDashboard, UserPlus, X, Shield, Briefcase, Mail, Key, Edit2 } from 'lucide-react';
+import { Users, LayoutDashboard, UserPlus, X, Shield, Briefcase, Mail, Key, Edit2, Settings, Upload, Image as ImageIcon } from 'lucide-react';
 
 const DEPARTMENTS = [
   "Finance", 
@@ -43,8 +43,8 @@ const POSITIONS = [
 ];
 
 export const AdminDashboard = () => {
-  const { requests, users, addUser, editUser } = useApp();
-  const [activeTab, setActiveTab] = useState<'overview' | 'users'>('overview');
+  const { requests, users, addUser, editUser, updateLogo, logoUrl } = useApp();
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'settings'>('overview');
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
 
@@ -147,6 +147,19 @@ export const AdminDashboard = () => {
     setIsUserModalOpen(false);
   };
 
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            if (typeof reader.result === 'string') {
+                updateLogo(reader.result);
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header and Tabs */}
@@ -169,6 +182,13 @@ export const AdminDashboard = () => {
             >
                 <Users size={16} />
                 <span>User Management</span>
+            </button>
+            <button 
+                onClick={() => setActiveTab('settings')}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'settings' ? 'bg-white text-brand-teal shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+            >
+                <Settings size={16} />
+                <span>Settings</span>
             </button>
         </div>
       </div>
@@ -331,6 +351,48 @@ export const AdminDashboard = () => {
                     </tbody>
                 </table>
              </div>
+          </div>
+      )}
+
+      {activeTab === 'settings' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <ImageIcon size={20} className="text-brand-teal" />
+                        Branding Settings
+                    </h3>
+                    
+                    <div className="border rounded-lg p-6 bg-gray-50 flex flex-col items-center justify-center gap-6">
+                        <div className="text-center">
+                            <p className="text-sm font-medium text-gray-700 mb-2">Current Organization Logo</p>
+                            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 inline-block">
+                                <img src={logoUrl} alt="Organization Logo" className="h-24 w-auto object-contain" />
+                            </div>
+                        </div>
+
+                        <div className="w-full max-w-md">
+                            <label className="block text-sm font-medium text-gray-700 mb-2 text-center">Upload New Logo (PNG, JPG, SVG)</label>
+                            <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:bg-gray-100 transition-colors">
+                                <input 
+                                    type="file" 
+                                    accept="image/*" 
+                                    onChange={handleLogoUpload}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                />
+                                <Upload className="mx-auto h-10 w-10 text-gray-400 mb-2" />
+                                <p className="text-sm text-gray-500">Click or drag file to upload</p>
+                            </div>
+                        </div>
+                    </div>
+               </div>
+
+               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 opacity-60">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+                        <Shield size={20} className="text-gray-500" />
+                        Other System Settings
+                    </h3>
+                    <p className="text-sm text-gray-500">Additional system configurations are currently disabled in demo mode.</p>
+               </div>
           </div>
       )}
 
