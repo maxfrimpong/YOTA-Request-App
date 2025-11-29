@@ -80,7 +80,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <h1 className="text-2xl font-bold text-white">
             PayFlow
           </h1>
-          <p className="text-brand-teal text-xs mt-1">Cash Payment System</p>
+          <p className="text-brand-teal text-xs mt-1">YOTA Payment Request System</p>
         </div>
 
         {/* Role Switcher if applicable */}
