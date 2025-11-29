@@ -83,6 +83,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       status: RequestStatus.PENDING_AUTHORIZATION,
+      editCount: 0,
       ...reqData
     };
     setRequests(prev => [newRequest, ...prev]);
@@ -95,6 +96,40 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         'info'
       );
     }
+  };
+
+  const editRequest = (id: string, updatedData: Partial<PaymentRequest>) => {
+    const originalRequest = requests.find(r => r.id === id);
+    if (!originalRequest) return;
+
+    if (originalRequest.editCount >= 2) {
+      // Should be prevented by UI, but safety check
+      return;
+    }
+
+    setRequests(prev => prev.map(req => {
+      if (req.id === id) {
+        return {
+          ...req,
+          ...updatedData,
+          editCount: req.editCount + 1,
+          updatedAt: new Date().toISOString(),
+          // Reset status to Pending Authorization if modified
+          status: RequestStatus.PENDING_AUTHORIZATION,
+          // Reset remarks if any
+          remarks: undefined
+        };
+      }
+      return req;
+    }));
+
+    // Notify Authorizer about the update
+    const authId = updatedData.authorizerId || originalRequest.authorizerId;
+    createNotification(
+        authId,
+        `Update: ${originalRequest.requesterName} has edited the request for ${updatedData.vendorName || originalRequest.vendorName}. Please review again.`,
+        'warning'
+    );
   };
 
   const updateRequestStatus = (id: string, status: RequestStatus, remarks?: string) => {
@@ -223,7 +258,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AppContext.Provider value={{ 
       user, activeRole, users, requests, notifications, messages, logoUrl,
-      login, logout, switchRole, addRequest, updateRequestStatus, addUser, editUser,
+      login, logout, switchRole, addRequest, editRequest, updateRequestStatus, addUser, editUser,
       markAsRead, markAllAsRead, sendMessage, markChatAsRead, updateLogo
     }}>
       {children}

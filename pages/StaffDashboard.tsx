@@ -1,12 +1,13 @@
 import React, { useState, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { RequestStatus, Role, RequestFile, PaymentRequest } from '../types';
-import { PlusCircle, Upload, CheckCircle, XCircle, Clock, AlertCircle, Eye, FileText, Download, X } from 'lucide-react';
+import { PlusCircle, Upload, CheckCircle, XCircle, Clock, AlertCircle, Eye, FileText, Download, X, Edit3 } from 'lucide-react';
 
 export const StaffDashboard = () => {
-  const { user, requests, users, addRequest } = useApp();
+  const { user, requests, users, addRequest, editRequest } = useApp();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [editingRequestId, setEditingRequestId] = useState<string | null>(null);
   
   // View Details State
   const [selectedRequest, setSelectedRequest] = useState<PaymentRequest | null>(null);
@@ -20,7 +21,8 @@ export const StaffDashboard = () => {
   const [paymentDetails, setPaymentDetails] = useState('');
   const [selectedAuthorizer, setSelectedAuthorizer] = useState('');
   const [signOff, setSignOff] = useState('');
-  const [files, setFiles] = useState<{name: string, type: 'memo'|'invoice'}[]>([]);
+  // Updated state type to include 'other'
+  const [files, setFiles] = useState<{name: string, type: 'memo'|'invoice'|'other'}[]>([]);
 
   // Refs for file inputs
   const memoInputRef = useRef<HTMLInputElement>(null);
@@ -37,6 +39,26 @@ export const StaffDashboard = () => {
     }
   };
 
+  const handleOpenNewRequest = () => {
+      setEditingRequestId(null);
+      resetForm();
+      setIsFormOpen(true);
+  };
+
+  const handleOpenEditRequest = (req: PaymentRequest) => {
+      setEditingRequestId(req.id);
+      setVendor(req.vendorName);
+      setAmount(req.amount.toString());
+      setCurrency(req.currency);
+      setDescription(req.description);
+      setPaymentDetails(req.paymentDetails);
+      setSelectedAuthorizer(req.authorizerId);
+      setSignOff(req.signOff);
+      // Map existing files to form format
+      setFiles(req.files.map(f => ({ name: f.name, type: f.type })));
+      setIsFormOpen(true);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -49,20 +71,38 @@ export const StaffDashboard = () => {
     setLoading(true);
     // Simulate API delay
     setTimeout(() => {
-      addRequest({
-        requesterId: user.id,
-        requesterName: user.name,
-        department: user.department,
-        position: user.position || 'Staff',
-        vendorName: vendor,
-        paymentDetails,
-        amount: parseFloat(amount),
-        currency,
-        description,
-        files: files.map(f => ({ ...f, url: '#' })),
-        authorizerId: selectedAuthorizer,
-        signOff
-      });
+      if (editingRequestId) {
+        // Edit Mode
+        editRequest(editingRequestId, {
+            vendorName: vendor,
+            amount: parseFloat(amount),
+            currency,
+            description,
+            paymentDetails,
+            authorizerId: selectedAuthorizer,
+            signOff,
+            // Only update files if new ones added or logic changed, for simplicity we assume files list is replaced if changed in form
+            // In a real app we'd handle file deltas. Here we just re-save the list
+            files: files.map(f => ({ ...f, url: '#' })) 
+        });
+      } else {
+        // Create Mode
+        addRequest({
+            requesterId: user.id,
+            requesterName: user.name,
+            department: user.department,
+            position: user.position || 'Staff',
+            vendorName: vendor,
+            paymentDetails,
+            amount: parseFloat(amount),
+            currency,
+            description,
+            files: files.map(f => ({ ...f, url: '#' })),
+            authorizerId: selectedAuthorizer,
+            signOff
+        });
+      }
+
       setLoading(false);
       setIsFormOpen(false);
       resetForm();
@@ -78,6 +118,7 @@ export const StaffDashboard = () => {
     setSelectedAuthorizer('');
     setSignOff('');
     setFiles([]);
+    setEditingRequestId(null);
   };
 
   const handleDownload = (file: RequestFile) => {
@@ -117,7 +158,7 @@ export const StaffDashboard = () => {
            <p className="text-gray-500 text-sm">Manage and track your payment requests</p>
         </div>
         <button
-          onClick={() => setIsFormOpen(true)}
+          onClick={handleOpenNewRequest}
           className="flex items-center space-x-2 bg-brand-teal hover:bg-[#008f7a] text-white px-4 py-2 rounded-lg shadow-sm transition-colors"
         >
           <PlusCircle size={18} />
@@ -165,15 +206,32 @@ export const StaffDashboard = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(req.createdAt).toLocaleDateString()}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{req.vendorName}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{req.currency} {req.amount.toLocaleString()}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(req.status)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                        {getStatusBadge(req.status)}
+                        {req.editCount > 0 && (
+                            <span className="ml-2 text-[10px] text-gray-400 bg-gray-100 px-1 rounded">Edits: {req.editCount}/2</span>
+                        )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex items-center space-x-3">
                         <button 
                             onClick={() => setSelectedRequest(req)}
                             className="text-brand-dark hover:text-brand-teal flex items-center space-x-1"
+                            title="View Details"
                         >
                             <Eye size={16} />
                             <span>View</span>
                         </button>
+                        
+                        {req.status !== RequestStatus.APPROVED && req.editCount < 2 && (
+                            <button 
+                                onClick={() => handleOpenEditRequest(req)}
+                                className="text-gray-500 hover:text-brand-orange flex items-center space-x-1"
+                                title="Edit Request"
+                            >
+                                <Edit3 size={16} />
+                                <span>Edit</span>
+                            </button>
+                        )}
                     </td>
                     </tr>
                 ))
@@ -205,6 +263,7 @@ export const StaffDashboard = () => {
                         <div className="flex flex-col items-end">
                             <span className="block text-sm text-gray-500 mb-1">Current Status</span>
                             {getStatusBadge(selectedRequest.status)}
+                            {selectedRequest.editCount > 0 && <span className="text-xs text-gray-400 mt-1">Revised {selectedRequest.editCount} times</span>}
                         </div>
                      </div>
 
@@ -254,19 +313,30 @@ export const StaffDashboard = () => {
                         </div>
                     </div>
                 </div>
-                <div className="p-6 border-t bg-gray-50 text-right">
+                <div className="p-6 border-t bg-gray-50 text-right space-x-3">
+                    {selectedRequest.status !== RequestStatus.APPROVED && selectedRequest.editCount < 2 && (
+                         <button 
+                            onClick={() => {
+                                setSelectedRequest(null);
+                                handleOpenEditRequest(selectedRequest);
+                            }} 
+                            className="px-4 py-2 bg-brand-teal text-white rounded hover:bg-[#008f7a]"
+                         >
+                            Edit Request
+                         </button>
+                    )}
                     <button onClick={() => setSelectedRequest(null)} className="px-4 py-2 bg-white border border-gray-300 rounded text-gray-700 hover:bg-gray-50">Close</button>
                 </div>
              </div>
         </div>
       )}
 
-      {/* New Request Modal */}
+      {/* New/Edit Request Modal */}
       {isFormOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl">
             <div className="flex justify-between items-center p-6 border-b">
-              <h3 className="text-xl font-bold text-gray-900">New Cash Payment Request</h3>
+              <h3 className="text-xl font-bold text-gray-900">{editingRequestId ? 'Edit Request' : 'New Cash Payment Request'}</h3>
               <button onClick={() => setIsFormOpen(false)} className="text-gray-400 hover:text-gray-600">
                 <XCircle size={24} />
               </button>
@@ -348,7 +418,7 @@ export const StaffDashboard = () => {
               <div className="flex justify-end space-x-3 pt-4 border-t">
                 <button type="button" onClick={() => setIsFormOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Cancel</button>
                 <button type="submit" disabled={loading} className="px-4 py-2 text-sm font-medium text-white bg-brand-teal rounded-md hover:bg-[#008f7a] disabled:opacity-50">
-                    {loading ? 'Submitting...' : 'Submit Request'}
+                    {loading ? 'Processing...' : (editingRequestId ? 'Update Request' : 'Submit Request')}
                 </button>
               </div>
             </form>

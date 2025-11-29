@@ -48,6 +48,7 @@ export interface PaymentRequest {
   updatedAt: string;
   remarks?: string; // For rejection/freezing notes
   signOff: string; // Requester's name signature
+  editCount: number; // Track number of edits
 }
 
 export interface Notification {
@@ -79,7 +80,8 @@ export interface AuthContextType {
   login: (email: string, password: string) => boolean;
   logout: () => void;
   switchRole: (role: Role) => void;
-  addRequest: (req: Omit<PaymentRequest, 'id' | 'createdAt' | 'updatedAt' | 'status'>) => void;
+  addRequest: (req: Omit<PaymentRequest, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'editCount'>) => void;
+  editRequest: (id: string, updatedData: Partial<PaymentRequest>) => void;
   updateRequestStatus: (id: string, status: RequestStatus, remarks?: string) => void;
   addUser: (userData: Omit<User, 'id'>) => void;
   editUser: (id: string, userData: Partial<User>) => void;

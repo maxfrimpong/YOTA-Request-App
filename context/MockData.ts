@@ -26,7 +26,8 @@ export const MOCK_REQUESTS: PaymentRequest[] = [
     status: RequestStatus.PENDING_AUTHORIZATION,
     createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
     updatedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-    signOff: 'Alice Staff'
+    signOff: 'Alice Staff',
+    editCount: 0
   },
   {
     id: 'r2',
@@ -44,7 +45,8 @@ export const MOCK_REQUESTS: PaymentRequest[] = [
     status: RequestStatus.AUTHORIZED,
     createdAt: new Date(Date.now() - 86400000 * 1).toISOString(),
     updatedAt: new Date(Date.now() - 43200000).toISOString(),
-    signOff: 'Bob Staff'
+    signOff: 'Bob Staff',
+    editCount: 0
   },
   {
     id: 'r3',
@@ -62,7 +64,8 @@ export const MOCK_REQUESTS: PaymentRequest[] = [
     status: RequestStatus.APPROVED,
     createdAt: new Date(Date.now() - 86400000 * 10).toISOString(),
     updatedAt: new Date(Date.now() - 86400000 * 8).toISOString(),
-    signOff: 'Alice Staff'
+    signOff: 'Alice Staff',
+    editCount: 0
   }
 ];
 
