@@ -30,7 +30,10 @@ export const Login = () => {
     <div className="min-h-screen bg-brand-dark flex flex-col items-center justify-between p-4">
       {/* Main Content Wrapper to center form */}
       <div className="w-full flex-1 flex flex-col items-center justify-center">
-          <div className="mb-8 text-center">
+          <div className="mb-8 text-center flex flex-col items-center">
+            <div className="bg-white p-4 rounded-xl mb-6 shadow-lg">
+                <img src="https://aistudiocdn.com/uploads/1c521369-0260-496e-a3b0-45d2729a35e8.png" alt="YOTA Logo" className="h-16 w-auto object-contain" />
+            </div>
             <h1 className="text-4xl font-bold text-white mb-2">
                 SendREQ
             </h1>

@@ -76,11 +76,14 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <aside className="w-64 bg-brand-dark text-white flex-shrink-0 hidden md:flex flex-col">
-        <div className="p-6 border-b border-white/10">
-          <h1 className="text-2xl font-bold text-white">
+        <div className="p-6 border-b border-white/10 flex flex-col">
+          <div className="bg-white p-3 rounded-lg w-full flex items-center justify-center mb-4 shadow-sm">
+             <img src="https://aistudiocdn.com/uploads/1c521369-0260-496e-a3b0-45d2729a35e8.png" alt="YOTA Logo" className="h-10 w-auto object-contain" />
+          </div>
+          <h1 className="text-xl font-bold text-white pl-1">
             SendREQ
           </h1>
-          <p className="text-brand-teal text-xs mt-1">YOTA Payment Request System</p>
+          <p className="text-brand-teal text-xs mt-1 pl-1">Payment Request System</p>
         </div>
 
         {/* Role Switcher if applicable */}
