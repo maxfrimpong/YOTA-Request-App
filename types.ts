@@ -79,6 +79,7 @@ export interface AuthContextType {
   notifications: Notification[];
   messages: ChatMessage[];
   logoUrl: string;
+  onlineUserIds: string[];
   login: (email: string, password: string) => boolean;
   logout: () => void;
   switchRole: (role: Role) => void;

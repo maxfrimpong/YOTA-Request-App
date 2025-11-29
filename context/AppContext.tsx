@@ -13,6 +13,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>(MOCK_MESSAGES);
   const [logoUrl, setLogoUrl] = useState<string>('logo.png');
+  const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
   
   // Simulate persistent login and logo for demo smoothness
   useEffect(() => {
@@ -32,7 +33,21 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     if (storedLogo) {
         setLogoUrl(storedLogo);
     }
-  }, [users]); // Re-run when users list changes (e.g. after edit)
+
+    // Simulate online users (Randomly pick 50% of users to be online)
+    const randomOnline = users
+        .filter(() => Math.random() > 0.4)
+        .map(u => u.id);
+    setOnlineUserIds(randomOnline);
+
+  }, [users]); // Re-run when users list changes
+
+  // Update online status when user logs in/out
+  useEffect(() => {
+      if (user) {
+          setOnlineUserIds(prev => [...new Set([...prev, user.id])]);
+      }
+  }, [user]);
 
   const login = (email: string, password: string): boolean => {
     const foundUser = users.find(u => 
@@ -50,6 +65,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
+    // Remove current user from online list locally
+    if (user) {
+        setOnlineUserIds(prev => prev.filter(id => id !== user.id));
+    }
     setUser(null);
     setActiveRole(null);
     localStorage.removeItem('sendreq_user_id');
@@ -263,7 +282,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AppContext.Provider value={{ 
-      user, activeRole, users, requests, notifications, messages, logoUrl,
+      user, activeRole, users, requests, notifications, messages, logoUrl, onlineUserIds,
       login, logout, switchRole, addRequest, editRequest, updateRequestStatus, addUser, editUser,
       markAsRead, markAllAsRead, sendMessage, markChatAsRead, updateLogo
     }}>

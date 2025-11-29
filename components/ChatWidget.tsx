@@ -5,7 +5,7 @@ import { MessageSquare, X, Send, ChevronLeft, Search } from 'lucide-react';
 import { User } from '../types';
 
 export const ChatWidget = () => {
-  const { user, users, messages, sendMessage, markChatAsRead } = useApp();
+  const { user, users, messages, sendMessage, markChatAsRead, onlineUserIds } = useApp();
   const [isOpen, setIsOpen] = useState(false);
   const [activeChatUser, setActiveChatUser] = useState<User | null>(null);
   const [inputText, setInputText] = useState('');
@@ -77,7 +77,7 @@ export const ChatWidget = () => {
                   <ChevronLeft size={20} />
                 </button>
                 <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
+                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center overflow-hidden relative">
                         {activeChatUser.profilePictureUrl ? (
                             <img src={activeChatUser.profilePictureUrl} alt={activeChatUser.name} className="w-full h-full object-cover" />
                         ) : (
@@ -86,7 +86,12 @@ export const ChatWidget = () => {
                     </div>
                     <div>
                        <h3 className="font-bold text-sm">{activeChatUser.name}</h3>
-                       <p className="text-xs text-brand-teal">{activeChatUser.department}</p>
+                       <div className="flex items-center space-x-1">
+                           {onlineUserIds.includes(activeChatUser.id) && (
+                               <div className="h-2 w-2 bg-green-400 rounded-full"></div>
+                           )}
+                           <p className="text-xs text-brand-teal">{activeChatUser.department}</p>
+                       </div>
                     </div>
                 </div>
               </div>
@@ -118,6 +123,7 @@ export const ChatWidget = () => {
                  <div className="divide-y divide-gray-100">
                     {otherUsers.map(u => {
                         const lastMsg = getLastMessage(u.id);
+                        const isOnline = onlineUserIds.includes(u.id);
                         return (
                             <div 
                             key={u.id} 
@@ -132,6 +138,9 @@ export const ChatWidget = () => {
                                         u.name.charAt(0)
                                     )}
                                 </div>
+                                {isOnline && (
+                                    <span className="absolute bottom-0 right-0 bg-green-500 h-3 w-3 rounded-full border-2 border-white" title="Online"></span>
+                                )}
                                 {unreadCounts[u.id] > 0 && (
                                 <span className="absolute -top-1 -right-1 bg-brand-orange text-white text-[10px] h-4 w-4 flex items-center justify-center rounded-full border border-white">
                                     {unreadCounts[u.id]}
@@ -143,11 +152,14 @@ export const ChatWidget = () => {
                                     <p className="text-sm font-semibold text-gray-900 truncate">{u.name}</p>
                                     {lastMsg && <p className="text-[10px] text-gray-400">{new Date(lastMsg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>}
                                 </div>
-                                <p className="text-xs text-gray-500 truncate">
-                                    {lastMsg 
-                                        ? (lastMsg.senderId === user.id ? `You: ${lastMsg.content}` : lastMsg.content) 
-                                        : <span className="italic text-gray-400">Start a conversation</span>}
-                                </p>
+                                <div className="flex justify-between items-center">
+                                    <p className="text-xs text-gray-500 truncate flex-1">
+                                        {lastMsg 
+                                            ? (lastMsg.senderId === user.id ? `You: ${lastMsg.content}` : lastMsg.content) 
+                                            : <span className="italic text-gray-400">Start a conversation</span>}
+                                    </p>
+                                    {isOnline && !lastMsg && <span className="text-[10px] text-green-600 font-medium ml-2">Online</span>}
+                                </div>
                             </div>
                             </div>
                         );
