@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { MessageSquare, X, Send, ChevronLeft, Search } from 'lucide-react';
@@ -75,9 +76,18 @@ export const ChatWidget = () => {
                 <button onClick={() => setActiveChatUser(null)} className="hover:bg-white/10 p-1 rounded-full">
                   <ChevronLeft size={20} />
                 </button>
-                <div>
-                   <h3 className="font-bold text-sm">{activeChatUser.name}</h3>
-                   <p className="text-xs text-brand-teal">{activeChatUser.department}</p>
+                <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
+                        {activeChatUser.profilePictureUrl ? (
+                            <img src={activeChatUser.profilePictureUrl} alt={activeChatUser.name} className="w-full h-full object-cover" />
+                        ) : (
+                            <span className="text-xs font-bold">{activeChatUser.name.charAt(0)}</span>
+                        )}
+                    </div>
+                    <div>
+                       <h3 className="font-bold text-sm">{activeChatUser.name}</h3>
+                       <p className="text-xs text-brand-teal">{activeChatUser.department}</p>
+                    </div>
                 </div>
               </div>
             ) : (
@@ -115,8 +125,12 @@ export const ChatWidget = () => {
                             className="p-3 hover:bg-white cursor-pointer transition-colors flex items-center space-x-3"
                             >
                             <div className="relative">
-                                <div className="h-10 w-10 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal font-bold border-2 border-white shadow-sm">
-                                {u.name.charAt(0)}
+                                <div className="h-10 w-10 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal font-bold border-2 border-white shadow-sm overflow-hidden">
+                                    {u.profilePictureUrl ? (
+                                        <img src={u.profilePictureUrl} alt={u.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        u.name.charAt(0)
+                                    )}
                                 </div>
                                 {unreadCounts[u.id] > 0 && (
                                 <span className="absolute -top-1 -right-1 bg-brand-orange text-white text-[10px] h-4 w-4 flex items-center justify-center rounded-full border border-white">

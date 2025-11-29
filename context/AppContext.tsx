@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { User, PaymentRequest, RequestStatus, Role, AuthContextType, Notification, ChatMessage } from '../types';
 import { MOCK_USERS, MOCK_REQUESTS, MOCK_MESSAGES } from './MockData';
@@ -31,7 +32,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     if (storedLogo) {
         setLogoUrl(storedLogo);
     }
-  }, [users]);
+  }, [users]); // Re-run when users list changes (e.g. after edit)
 
   const login = (email: string, password: string): boolean => {
     const foundUser = users.find(u => 
@@ -218,7 +219,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const editUser = (id: string, userData: Partial<User>) => {
     setUsers(prev => prev.map(u => {
       if (u.id === id) {
-        return { ...u, ...userData };
+        const updatedUser = { ...u, ...userData };
+        // If the edited user is the current logged-in user, update local session state immediately
+        if (user && user.id === id) {
+           setUser(updatedUser);
+        }
+        return updatedUser;
       }
       return u;
     }));

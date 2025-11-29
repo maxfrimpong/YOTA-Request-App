@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -314,8 +315,12 @@ export const AdminDashboard = () => {
                             <tr key={u.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center">
-                                        <div className="h-10 w-10 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal font-bold mr-3">
-                                            {u.name.charAt(0)}
+                                        <div className="h-10 w-10 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal font-bold mr-3 overflow-hidden">
+                                            {u.profilePictureUrl ? (
+                                                <img src={u.profilePictureUrl} alt={u.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                u.name.charAt(0)
+                                            )}
                                         </div>
                                         <div>
                                             <div className="text-sm font-medium text-gray-900">{u.name}</div>

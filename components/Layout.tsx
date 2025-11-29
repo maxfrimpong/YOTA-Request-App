@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { Role } from '../types';
@@ -165,8 +166,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                         <p className="text-sm font-bold text-gray-800">{user.name}</p>
                         <p className="text-xs text-gray-500">{user.department}</p>
                      </div>
-                     <div className="w-9 h-9 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal font-bold border-2 border-white shadow-sm">
-                        {user.name.charAt(0)}
+                     <div className="w-9 h-9 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal font-bold border-2 border-white shadow-sm overflow-hidden">
+                        {user.profilePictureUrl ? (
+                            <img src={user.profilePictureUrl} alt={user.name} className="w-full h-full object-cover" />
+                        ) : (
+                            user.name.charAt(0)
+                        )}
                      </div>
                   </Link>
               </div>
@@ -180,8 +185,14 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 </div>
             </div>
             <div className="flex items-center gap-3">
-                <Link to="/profile" className="text-gray-300 hover:text-white">
-                    <UserIcon size={20} />
+                <Link to="/profile" className="text-gray-300 hover:text-white flex items-center">
+                    <div className="w-8 h-8 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal font-bold border border-white/20 overflow-hidden bg-white/10">
+                        {user.profilePictureUrl ? (
+                            <img src={user.profilePictureUrl} alt={user.name} className="w-full h-full object-cover" />
+                        ) : (
+                            <UserIcon size={16} className="text-white" />
+                        )}
+                    </div>
                 </Link>
                 <div className="relative" ref={notificationRef}>
                       <button 

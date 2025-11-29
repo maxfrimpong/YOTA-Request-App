@@ -1,3 +1,4 @@
+
 export enum Role {
   ADMIN = 'ADMIN',
   STAFF = 'STAFF',
@@ -22,6 +23,7 @@ export interface User {
   roles: Role[]; // Changed from single role to array
   department: string;
   position?: string;
+  profilePictureUrl?: string;
 }
 
 export interface RequestFile {
