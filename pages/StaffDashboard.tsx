@@ -1,7 +1,8 @@
+
 import React, { useState, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { RequestStatus, Role, RequestFile, PaymentRequest } from '../types';
-import { PlusCircle, Upload, CheckCircle, XCircle, Clock, AlertCircle, Eye, FileText, Download, X, Edit3 } from 'lucide-react';
+import { PlusCircle, Upload, CheckCircle, XCircle, Clock, AlertCircle, Eye, FileText, Download, X, Edit3, CreditCard, Smartphone, Landmark } from 'lucide-react';
 
 export const StaffDashboard = () => {
   const { user, requests, users, addRequest, editRequest } = useApp();
@@ -18,11 +19,22 @@ export const StaffDashboard = () => {
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState<'GHS' | 'USD' | 'EUR' | 'GBP'>('GHS');
   const [description, setDescription] = useState('');
-  const [paymentDetails, setPaymentDetails] = useState('');
   const [selectedAuthorizer, setSelectedAuthorizer] = useState('');
   const [signOff, setSignOff] = useState('');
-  // Updated state type to include 'other'
   const [files, setFiles] = useState<{name: string, type: 'memo'|'invoice'|'other'}[]>([]);
+
+  // Payment Details State
+  const [paymentMethod, setPaymentMethod] = useState<'Mobile Money' | 'Bank Account'>('Mobile Money');
+  // Momo Fields
+  const [momoOperator, setMomoOperator] = useState('MTN Momo');
+  const [momoNumber, setMomoNumber] = useState('');
+  // Bank Fields
+  const [bankName, setBankName] = useState('');
+  const [accName, setAccName] = useState('');
+  const [accNumber, setAccNumber] = useState('');
+  const [branchName, setBranchName] = useState('');
+  const [sortCode, setSortCode] = useState('');
+  const [swift, setSwift] = useState('');
 
   // Refs for file inputs
   const memoInputRef = useRef<HTMLInputElement>(null);
@@ -51,11 +63,44 @@ export const StaffDashboard = () => {
       setAmount(req.amount.toString());
       setCurrency(req.currency);
       setDescription(req.description);
-      setPaymentDetails(req.paymentDetails);
       setSelectedAuthorizer(req.authorizerId);
       setSignOff(req.signOff);
-      // Map existing files to form format
       setFiles(req.files.map(f => ({ name: f.name, type: f.type })));
+
+      // Attempt to parse payment details
+      const details = req.paymentDetails || '';
+      if (details.startsWith('Mobile Money')) {
+          setPaymentMethod('Mobile Money');
+          // Format: Mobile Money - OPERATOR: NUMBER
+          const parts = details.split(':');
+          if (parts.length >= 2) {
+              const opPart = parts[0].split('-')[1]?.trim();
+              if (opPart) setMomoOperator(opPart);
+              setMomoNumber(parts[1]?.trim() || '');
+          }
+      } else if (details.startsWith('Bank Transfer')) {
+          setPaymentMethod('Bank Account');
+          // Simple parsing strategy or just dump into Bank Name if complex
+          // Format: Bank Transfer - Bank: X, Name: Y, No: Z, Branch: A, Code: B, SWIFT: C
+          const bankMatch = details.match(/Bank:\s*([^,]+)/);
+          const nameMatch = details.match(/Name:\s*([^,]+)/);
+          const noMatch = details.match(/No:\s*([^,]+)/);
+          const branchMatch = details.match(/Branch:\s*([^,]+)/);
+          const codeMatch = details.match(/Code:\s*([^,]+)/);
+          const swiftMatch = details.match(/SWIFT:\s*([^$]+)/);
+
+          if (bankMatch) setBankName(bankMatch[1].trim());
+          if (nameMatch) setAccName(nameMatch[1].trim());
+          if (noMatch) setAccNumber(noMatch[1].trim());
+          if (branchMatch) setBranchName(branchMatch[1].trim());
+          if (codeMatch) setSortCode(codeMatch[1].trim());
+          if (swiftMatch) setSwift(swiftMatch[1].trim());
+      } else {
+          // Fallback for legacy data
+          setPaymentMethod('Bank Account');
+          setBankName(details); // Put everything in bank name so user sees it
+      }
+
       setIsFormOpen(true);
   };
 
@@ -68,6 +113,14 @@ export const StaffDashboard = () => {
       return;
     }
 
+    // Construct Payment Details String
+    let finalPaymentDetails = '';
+    if (paymentMethod === 'Mobile Money') {
+        finalPaymentDetails = `Mobile Money - ${momoOperator}: ${momoNumber}`;
+    } else {
+        finalPaymentDetails = `Bank Transfer - Bank: ${bankName}, Name: ${accName}, No: ${accNumber}, Branch: ${branchName}, Code: ${sortCode}, SWIFT: ${swift}`;
+    }
+
     setLoading(true);
     // Simulate API delay
     setTimeout(() => {
@@ -78,11 +131,9 @@ export const StaffDashboard = () => {
             amount: parseFloat(amount),
             currency,
             description,
-            paymentDetails,
+            paymentDetails: finalPaymentDetails,
             authorizerId: selectedAuthorizer,
             signOff,
-            // Only update files if new ones added or logic changed, for simplicity we assume files list is replaced if changed in form
-            // In a real app we'd handle file deltas. Here we just re-save the list
             files: files.map(f => ({ ...f, url: '#' })) 
         });
       } else {
@@ -93,7 +144,7 @@ export const StaffDashboard = () => {
             department: user.department,
             position: user.position || 'Staff',
             vendorName: vendor,
-            paymentDetails,
+            paymentDetails: finalPaymentDetails,
             amount: parseFloat(amount),
             currency,
             description,
@@ -114,21 +165,30 @@ export const StaffDashboard = () => {
     setAmount('');
     setCurrency('GHS');
     setDescription('');
-    setPaymentDetails('');
     setSelectedAuthorizer('');
     setSignOff('');
     setFiles([]);
     setEditingRequestId(null);
+    
+    // Reset Payment fields
+    setPaymentMethod('Mobile Money');
+    setMomoOperator('MTN Momo');
+    setMomoNumber('');
+    setBankName('');
+    setAccName('');
+    setAccNumber('');
+    setBranchName('');
+    setSortCode('');
+    setSwift('');
   };
 
   const handleDownload = (file: RequestFile) => {
-    // Simulate download by creating a blob
     const content = `Mock content for file: ${file.name}\nType: ${file.type}\n\nThis is a generated file for demonstration purposes.`;
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = file.name; // Use the mock filename
+    a.download = file.name;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -368,10 +428,135 @@ export const StaffDashboard = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Payment Details (Bank/Account)</label>
-                <input required type="text" className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
-                  value={paymentDetails} onChange={e => setPaymentDetails(e.target.value)} />
+              {/* Structured Payment Details */}
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center">
+                    <CreditCard size={16} className="mr-2" /> Payment Details
+                </h4>
+                
+                <div className="mb-4">
+                    <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Payment Method</label>
+                    <div className="flex space-x-4">
+                        <label className={`flex items-center space-x-2 cursor-pointer p-2 rounded border ${paymentMethod === 'Mobile Money' ? 'bg-white border-brand-teal ring-1 ring-brand-teal' : 'border-gray-300 hover:bg-white'}`}>
+                            <input 
+                                type="radio" 
+                                name="paymentMethod" 
+                                className="text-brand-teal focus:ring-brand-teal"
+                                checked={paymentMethod === 'Mobile Money'}
+                                onChange={() => setPaymentMethod('Mobile Money')}
+                            />
+                            <div className="flex items-center">
+                                <Smartphone size={16} className="mr-2 text-gray-600"/>
+                                <span className="text-sm font-medium">Mobile Money</span>
+                            </div>
+                        </label>
+                        <label className={`flex items-center space-x-2 cursor-pointer p-2 rounded border ${paymentMethod === 'Bank Account' ? 'bg-white border-brand-teal ring-1 ring-brand-teal' : 'border-gray-300 hover:bg-white'}`}>
+                            <input 
+                                type="radio" 
+                                name="paymentMethod" 
+                                className="text-brand-teal focus:ring-brand-teal"
+                                checked={paymentMethod === 'Bank Account'}
+                                onChange={() => setPaymentMethod('Bank Account')}
+                            />
+                            <div className="flex items-center">
+                                <Landmark size={16} className="mr-2 text-gray-600"/>
+                                <span className="text-sm font-medium">Bank Account</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                {paymentMethod === 'Mobile Money' ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Network Operator</label>
+                            <select 
+                                required 
+                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal sm:text-sm"
+                                value={momoOperator}
+                                onChange={(e) => setMomoOperator(e.target.value)}
+                            >
+                                <option value="MTN Momo">MTN Momo</option>
+                                <option value="Telecel Cash">Telecel Cash</option>
+                                <option value="AT Cash">AT Cash</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Mobile Number</label>
+                            <input 
+                                required 
+                                type="text" 
+                                placeholder="024xxxxxxx"
+                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                value={momoNumber}
+                                onChange={(e) => setMomoNumber(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700">Bank Name</label>
+                            <input 
+                                required 
+                                type="text" 
+                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                value={bankName}
+                                onChange={(e) => setBankName(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Account Name</label>
+                            <input 
+                                required 
+                                type="text" 
+                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                value={accName}
+                                onChange={(e) => setAccName(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Account Number</label>
+                            <input 
+                                required 
+                                type="text" 
+                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                value={accNumber}
+                                onChange={(e) => setAccNumber(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Branch Name</label>
+                            <input 
+                                required 
+                                type="text" 
+                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                value={branchName}
+                                onChange={(e) => setBranchName(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Sort/IBAN/Branch Code</label>
+                            <input 
+                                required 
+                                type="text" 
+                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                value={sortCode}
+                                onChange={(e) => setSortCode(e.target.value)}
+                            />
+                        </div>
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700">SWIFT Code</label>
+                            <input 
+                                required 
+                                type="text" 
+                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                                value={swift}
+                                onChange={(e) => setSwift(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                )}
               </div>
 
               <div>
