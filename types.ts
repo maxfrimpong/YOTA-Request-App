@@ -103,6 +103,7 @@ export interface AuthContextType {
   notifications: Notification[];
   messages: ChatMessage[];
   logoUrl: string;
+  copyrightText: string;
   onlineUserIds: string[];
   systemLists: SystemLists;
   showDemoCredentials: boolean;
@@ -119,6 +120,7 @@ export interface AuthContextType {
   sendMessage: (receiverId: string, content: string) => void;
   markChatAsRead: (senderId: string) => void;
   updateLogo: (url: string) => void;
+  updateCopyrightText: (text: string) => void;
   updateSystemList: (listName: keyof SystemLists, newList: string[]) => void;
   toggleDemoCredentials: (show: boolean) => void;
 }

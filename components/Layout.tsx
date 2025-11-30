@@ -1,4 +1,5 @@
 
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { Role } from '../types';
@@ -7,7 +8,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { ChatWidget } from './ChatWidget';
 
 export const Layout = ({ children }: { children?: React.ReactNode }) => {
-  const { user, activeRole, switchRole, logout, notifications, markAsRead, markAllAsRead, logoUrl } = useApp();
+  const { user, activeRole, switchRole, logout, notifications, markAsRead, markAllAsRead, logoUrl, copyrightText } = useApp();
   const location = useLocation();
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -219,9 +220,7 @@ export const Layout = ({ children }: { children?: React.ReactNode }) => {
               {children}
             </div>
             <footer className="py-6 text-center border-t border-gray-200/50 mt-auto bg-gray-50/50">
-                <p className="text-xs text-gray-400">
-                    &copy; {new Date().getFullYear()} SendREQ. Custom developed for <span className="font-semibold text-brand-dark">YOTA - Youth Opportunity and Transformation in Africa</span>.
-                </p>
+                <p className="text-xs text-gray-400" dangerouslySetInnerHTML={{ __html: copyrightText }}></p>
             </footer>
           </main>
 

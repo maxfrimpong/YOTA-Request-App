@@ -33,6 +33,8 @@ const DEFAULT_LISTS: SystemLists = {
   ]
 };
 
+const DEFAULT_COPYRIGHT = `&copy; ${new Date().getFullYear()} SendREQ. Custom developed for <span class="font-semibold">YOTA - Youth Opportunity and Transformation in Africa</span>.`;
+
 export const AppProvider = ({ children }: { children?: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [activeRole, setActiveRole] = useState<string | null>(null);
@@ -41,6 +43,7 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>(MOCK_MESSAGES);
   const [logoUrl, setLogoUrl] = useState<string>('logo.png');
+  const [copyrightText, setCopyrightText] = useState<string>(DEFAULT_COPYRIGHT);
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
   const [systemLists, setSystemLists] = useState<SystemLists>(DEFAULT_LISTS);
   const [showDemoCredentials, setShowDemoCredentials] = useState<boolean>(true);
@@ -61,6 +64,11 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
     const storedLogo = localStorage.getItem('sendreq_logo');
     if (storedLogo) {
         setLogoUrl(storedLogo);
+    }
+
+    const storedCopyright = localStorage.getItem('sendreq_copyright');
+    if (storedCopyright) {
+        setCopyrightText(storedCopyright);
     }
 
     const storedLists = localStorage.getItem('sendreq_lists');
@@ -123,6 +131,11 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
   const updateLogo = (url: string) => {
       setLogoUrl(url);
       localStorage.setItem('sendreq_logo', url);
+  };
+
+  const updateCopyrightText = (text: string) => {
+      setCopyrightText(text);
+      localStorage.setItem('sendreq_copyright', text);
   };
 
   const updateSystemList = (listName: keyof SystemLists, newList: string[]) => {
@@ -322,9 +335,9 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
 
   return (
     <AppContext.Provider value={{ 
-      user, activeRole, users, requests, notifications, messages, logoUrl, onlineUserIds, systemLists, showDemoCredentials,
+      user, activeRole, users, requests, notifications, messages, logoUrl, copyrightText, onlineUserIds, systemLists, showDemoCredentials,
       login, logout, switchRole, addRequest, editRequest, updateRequestStatus, addUser, editUser,
-      markAsRead, markAllAsRead, sendMessage, markChatAsRead, updateLogo, updateSystemList, toggleDemoCredentials
+      markAsRead, markAllAsRead, sendMessage, markChatAsRead, updateLogo, updateCopyrightText, updateSystemList, toggleDemoCredentials
     }}>
       {children}
     </AppContext.Provider>

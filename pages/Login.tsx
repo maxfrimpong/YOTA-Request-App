@@ -5,7 +5,7 @@ import { useApp } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 
 export const Login = () => {
-  const { login, user, logoUrl, showDemoCredentials } = useApp();
+  const { login, user, logoUrl, showDemoCredentials, copyrightText } = useApp();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -107,9 +107,7 @@ export const Login = () => {
 
       {/* Copyright Footer */}
       <footer className="py-6 text-center">
-        <p className="text-xs text-gray-400">
-            &copy; {new Date().getFullYear()} SendREQ. Custom developed for <span className="font-semibold text-brand-teal">YOTA - Youth Opportunity and Transformation in Africa</span>.
-        </p>
+        <p className="text-xs text-gray-400" dangerouslySetInnerHTML={{ __html: copyrightText }}></p>
       </footer>
     </div>
   );

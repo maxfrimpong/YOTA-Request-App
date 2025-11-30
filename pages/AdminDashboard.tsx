@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { RequestStatus, Role, User, SystemLists } from '../types';
-import { Users, LayoutDashboard, UserPlus, X, Shield, Briefcase, Mail, Key, Edit2, Settings, Upload, Image as ImageIcon, Plus, Trash2, List, Save, XCircle, Undo2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Users, LayoutDashboard, UserPlus, X, Shield, Briefcase, Mail, Key, Edit2, Settings, Upload, Image as ImageIcon, Plus, Trash2, List, Save, XCircle, Undo2, ToggleLeft, ToggleRight, Type } from 'lucide-react';
 
 const ListManager = ({ title, items = [], onUpdate }: { title: string, items: string[], onUpdate: (newItems: string[]) => void }) => {
     const [newItem, setNewItem] = useState('');
@@ -187,7 +187,7 @@ const ListManager = ({ title, items = [], onUpdate }: { title: string, items: st
 };
 
 export const AdminDashboard = () => {
-  const { requests, users, addUser, editUser, updateLogo, logoUrl, systemLists, updateSystemList, showDemoCredentials, toggleDemoCredentials } = useApp();
+  const { requests, users, addUser, editUser, updateLogo, logoUrl, systemLists, updateSystemList, showDemoCredentials, toggleDemoCredentials, copyrightText, updateCopyrightText } = useApp();
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'settings'>('overview');
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
@@ -200,6 +200,20 @@ export const AdminDashboard = () => {
   // Roles are now an array of strings
   const [newRoles, setNewRoles] = useState<string[]>([]);
   const [newPassword, setNewPassword] = useState('');
+
+  // Local state for editing copyright to avoid too many re-renders/commits
+  const [localCopyright, setLocalCopyright] = useState(copyrightText);
+  
+  // Sync local state when context updates (e.g. initial load)
+  useEffect(() => {
+      setLocalCopyright(copyrightText);
+  }, [copyrightText]);
+
+  const handleCopyrightBlur = () => {
+      if (localCopyright !== copyrightText) {
+          updateCopyrightText(localCopyright);
+      }
+  };
 
   // Calculate Totals
   const totalRequests = requests.length;
@@ -533,6 +547,32 @@ export const AdminDashboard = () => {
                     </div>
                </div>
                
+               {/* Footer / Copyright Settings */}
+               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <Type size={20} className="text-brand-teal" />
+                        Footer Settings
+                    </h3>
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Copyright Note</label>
+                        <p className="text-xs text-gray-500 mb-3">
+                            Customize the text that appears at the bottom of the login page and dashboard. You can use simple HTML tags like &lt;span&gt; or &lt;strong&gt;.
+                        </p>
+                        <textarea 
+                            value={localCopyright}
+                            onChange={(e) => setLocalCopyright(e.target.value)}
+                            onBlur={handleCopyrightBlur}
+                            rows={3}
+                            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                            placeholder="Enter copyright text..."
+                        />
+                        <div className="mt-2 flex items-center text-xs text-gray-400">
+                            <span className="font-semibold mr-2">Preview:</span>
+                            <span dangerouslySetInnerHTML={{ __html: localCopyright }}></span>
+                        </div>
+                    </div>
+               </div>
+
                {/* Login Configuration */}
                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                     <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
