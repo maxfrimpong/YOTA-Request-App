@@ -1,8 +1,8 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { PaymentRequest } from "../types";
 
 const getClient = () => {
+  // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
   const apiKey = process.env.API_KEY;
   if (!apiKey) {
     console.warn("API_KEY not found in environment variables");
