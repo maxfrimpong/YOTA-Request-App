@@ -3,11 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { RequestStatus, PaymentRequest, RequestFile } from '../types';
 import { summarizeRequest } from '../services/geminiService';
-import { CheckCircle, XCircle, Sparkles, Loader2, DollarSign, FileText, Download, X, Eye } from 'lucide-react';
+import { CheckCircle, XCircle, Sparkles, Loader2, DollarSign, FileText, Download, X, Eye, Printer } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { printPaymentRequest } from '../utils/pdfGenerator';
 
 export const ApproverDashboard = () => {
-  const { requests, updateRequestStatus } = useApp();
+  const { requests, updateRequestStatus, users, logoUrl } = useApp();
   const [selectedRequest, setSelectedRequest] = useState<PaymentRequest | null>(null);
   const [geminiSummary, setGeminiSummary] = useState<string>('');
   const [isSummarizing, setIsSummarizing] = useState(false);
@@ -86,6 +87,11 @@ export const ApproverDashboard = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handlePrintPdf = () => {
+      if (!selectedRequest) return;
+      printPaymentRequest(selectedRequest, users, logoUrl);
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -136,7 +142,7 @@ export const ApproverDashboard = () => {
                         >
                             <div className="flex justify-between items-start">
                                 <h4 className="font-bold text-gray-900">{req.requestSubject}</h4>
-                                <span className="font-semibold text-brand-teal text-sm">{req.currency} {req.amount.toLocaleString()}</p>
+                                <span className="font-semibold text-brand-teal text-sm">{req.currency} {req.amount.toLocaleString()}</span>
                             </div>
                             <p className="text-sm text-gray-600 mt-1">{req.vendorName}</p>
                             <p className="text-xs text-gray-400 mt-1">{new Date(req.createdAt).toLocaleDateString()}</p>
@@ -182,9 +188,19 @@ export const ApproverDashboard = () => {
                     {selectedRequest.status !== RequestStatus.AUTHORIZED && (
                         <div className="flex items-center justify-between border-b pb-4">
                             <h3 className="text-2xl font-bold text-gray-900">{selectedRequest.requestSubject}</h3>
-                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${selectedRequest.status === RequestStatus.APPROVED ? 'bg-brand-teal/10 text-brand-teal' : 'bg-brand-orange/10 text-brand-orange'}`}>
-                                {selectedRequest.status}
-                            </span>
+                            <div className="flex flex-col items-end">
+                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${selectedRequest.status === RequestStatus.APPROVED ? 'bg-brand-teal/10 text-brand-teal' : 'bg-brand-orange/10 text-brand-orange'}`}>
+                                    {selectedRequest.status}
+                                </span>
+                                {selectedRequest.status === RequestStatus.APPROVED && (
+                                    <button 
+                                        onClick={handlePrintPdf}
+                                        className="mt-2 text-xs bg-brand-dark text-white px-2 py-1 rounded shadow hover:bg-[#004d61] flex items-center"
+                                    >
+                                        <Printer size={12} className="mr-1"/> Download PDF
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     )}
 

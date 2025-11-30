@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { RequestStatus, PaymentRequest, RequestFile } from '../types';
-import { CheckCircle, XCircle, AlertTriangle, Eye, FileText, Download, X } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, Eye, FileText, Download, X, Printer } from 'lucide-react';
+import { printPaymentRequest } from '../utils/pdfGenerator';
 
 export const AuthorizerDashboard = () => {
-  const { user, requests, updateRequestStatus } = useApp();
+  const { user, requests, updateRequestStatus, users, logoUrl } = useApp();
   const [selectedRequest, setSelectedRequest] = useState<PaymentRequest | null>(null);
   const [action, setAction] = useState<'AUTHORIZE' | 'REJECT' | 'FREEZE' | null>(null);
   const [remarks, setRemarks] = useState('');
@@ -50,6 +51,11 @@ export const AuthorizerDashboard = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const handlePrintPdf = () => {
+      if (!selectedRequest) return;
+      printPaymentRequest(selectedRequest, users, logoUrl);
   };
 
   return (
@@ -109,7 +115,17 @@ export const AuthorizerDashboard = () => {
                                 {selectedRequest.status}
                            </span>
                         </div>
-                        <span className="text-2xl font-bold text-brand-dark">{selectedRequest.currency} {selectedRequest.amount.toLocaleString()}</span>
+                        <div className="flex flex-col items-end">
+                             <span className="text-2xl font-bold text-brand-dark">{selectedRequest.currency} {selectedRequest.amount.toLocaleString()}</span>
+                             {selectedRequest.status === RequestStatus.APPROVED && (
+                                 <button 
+                                    onClick={handlePrintPdf}
+                                    className="mt-2 text-xs bg-brand-dark text-white px-2 py-1 rounded shadow hover:bg-[#004d61] flex items-center"
+                                 >
+                                     <Printer size={12} className="mr-1"/> Download PDF
+                                 </button>
+                             )}
+                        </div>
                     </div>
 
                     <div className="space-y-4 mb-8">

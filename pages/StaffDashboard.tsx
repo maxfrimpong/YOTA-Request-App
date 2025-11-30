@@ -2,10 +2,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { RequestStatus, Role, RequestFile, PaymentRequest, BillingItem } from '../types';
-import { PlusCircle, Upload, CheckCircle, XCircle, Clock, AlertCircle, Eye, FileText, Download, X, Edit3, CreditCard, Smartphone, Landmark, Briefcase, FileType, Plus, Trash2 } from 'lucide-react';
+import { PlusCircle, Upload, CheckCircle, XCircle, Clock, AlertCircle, Eye, FileText, Download, X, Edit3, CreditCard, Smartphone, Landmark, Briefcase, FileType, Plus, Trash2, Printer } from 'lucide-react';
+import { printPaymentRequest } from '../utils/pdfGenerator';
 
 export const StaffDashboard = () => {
-  const { user, requests, users, addRequest, editRequest, systemLists } = useApp();
+  const { user, requests, users, addRequest, editRequest, systemLists, logoUrl } = useApp();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [editingRequestId, setEditingRequestId] = useState<string | null>(null);
@@ -53,7 +54,6 @@ export const StaffDashboard = () => {
   const [genericPaymentDetails, setGenericPaymentDetails] = useState('');
 
   // Refs for file inputs
-  const memoInputRef = useRef<HTMLInputElement>(null);
   const invoiceInputRef = useRef<HTMLInputElement>(null);
 
   // Filter users who have the AUTHORIZER role
@@ -305,6 +305,11 @@ export const StaffDashboard = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handlePrintPdf = () => {
+      if (!selectedRequest) return;
+      printPaymentRequest(selectedRequest, users, logoUrl);
+  };
+
   const getStatusBadge = (status: RequestStatus) => {
     switch (status) {
       case RequestStatus.APPROVED:
@@ -550,6 +555,15 @@ export const StaffDashboard = () => {
                     </div>
                 </div>
                 <div className="p-6 border-t bg-gray-50 text-right space-x-3">
+                    {selectedRequest.status === RequestStatus.APPROVED && (
+                        <button 
+                            onClick={handlePrintPdf}
+                            className="px-4 py-2 bg-brand-dark text-white rounded hover:bg-[#004d61] shadow-sm inline-flex items-center"
+                        >
+                            <Printer size={16} className="mr-2" /> Download PDF
+                        </button>
+                    )}
+
                     {selectedRequest.status !== RequestStatus.APPROVED && selectedRequest.editCount < 2 && (
                          <button 
                             onClick={() => {
@@ -890,14 +904,7 @@ export const StaffDashboard = () => {
                 </div>
 
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer"
-                        onClick={() => memoInputRef.current?.click()}>
-                        <input type="file" ref={memoInputRef} className="hidden" accept=".pdf,.doc,.docx" onChange={(e) => handleFileChange(e, 'memo')} />
-                        <Upload className="mx-auto h-8 w-8 text-gray-400" />
-                        <span className="mt-2 block text-sm font-medium text-gray-600">Upload Memo (PDF/Doc)</span>
-                        {files.filter(f => f.type === 'memo').length > 0 && <span className="text-xs text-brand-teal mt-1">File Selected</span>}
-                    </div>
+                <div className="grid grid-cols-1 gap-6">
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer"
                         onClick={() => invoiceInputRef.current?.click()}>
                         <input type="file" ref={invoiceInputRef} className="hidden" accept="image/*,.pdf" onChange={(e) => handleFileChange(e, 'invoice')} />
