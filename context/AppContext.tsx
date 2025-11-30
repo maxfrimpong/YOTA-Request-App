@@ -1,4 +1,5 @@
 
+
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { User, PaymentRequest, RequestStatus, Role, AuthContextType, Notification, ChatMessage, SystemLists } from '../types';
 import { MOCK_USERS, MOCK_REQUESTS, MOCK_MESSAGES } from './MockData';
@@ -13,12 +14,28 @@ const DEFAULT_LISTS: SystemLists = {
     "YOTA Main", "YOTA USD", "YOTA GBP", "AYP 2", "GYEOS"
   ],
   paymentMethods: ['Mobile Money', 'Bank Account'],
-  momoOperators: ['MTN Momo', 'Telecel Cash', 'AT Cash']
+  momoOperators: ['MTN Momo', 'Telecel Cash', 'AT Cash'],
+  departments: [
+    "Finance", "Projects", "Operations & Logistics", "Digital Engagement", 
+    "IT", "Skills Hub", "Get Into Employment", "HR & Admin"
+  ],
+  positions: [
+    "Executive Director", "Skills & Innovation Manager", "Project Manager", 
+    "Project Associate", "Project Officer", "Finance Manager", "Finance Officer", 
+    "Finance Associate", "Digital Engagement Manager", "Digital Engagement Analyst", 
+    "Digital Engagement Associate", "IT Manager", "IT Officer", "IT Associate", 
+    "Operations Manager", "Operations Support Officer", "Driver", "Senior Driver", 
+    "Security", "Senior Housekeeper", "Housekeeper", "Senior Security Officer", 
+    "Security Officer", "Intern"
+  ],
+  roles: [
+    Role.ADMIN, Role.STAFF, Role.AUTHORIZER, Role.APPROVER, Role.AUDITOR
+  ]
 };
 
 export const AppProvider = ({ children }: { children?: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [activeRole, setActiveRole] = useState<Role | null>(null);
+  const [activeRole, setActiveRole] = useState<string | null>(null);
   const [requests, setRequests] = useState<PaymentRequest[]>(MOCK_REQUESTS);
   const [users, setUsers] = useState<User[]>(MOCK_USERS);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -47,7 +64,10 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
 
     const storedLists = localStorage.getItem('sendreq_lists');
     if (storedLists) {
-        setSystemLists(JSON.parse(storedLists));
+        setSystemLists(prev => ({
+            ...prev,
+            ...JSON.parse(storedLists)
+        }));
     }
 
     // Simulate online users
@@ -88,7 +108,7 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
     localStorage.removeItem('sendreq_user_id');
   };
 
-  const switchRole = (role: Role) => {
+  const switchRole = (role: string) => {
     if (user && user.roles.includes(role)) {
       setActiveRole(role);
     }

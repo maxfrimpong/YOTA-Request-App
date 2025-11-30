@@ -1,4 +1,5 @@
 
+
 export enum Role {
   ADMIN = 'ADMIN',
   STAFF = 'STAFF',
@@ -21,7 +22,7 @@ export interface User {
   name: string;
   email: string;
   password?: string;
-  roles: Role[]; // Changed from single role to array
+  roles: string[]; // Changed from Role[] to string[] to support dynamic roles
   department: string;
   position?: string;
   profilePictureUrl?: string;
@@ -89,11 +90,14 @@ export interface SystemLists {
   billingProjects: string[];
   paymentMethods: string[];
   momoOperators: string[];
+  departments: string[];
+  positions: string[];
+  roles: string[];
 }
 
 export interface AuthContextType {
   user: User | null;
-  activeRole: Role | null; // The currently selected role for the session
+  activeRole: string | null; // Changed from Role to string
   users: User[];
   requests: PaymentRequest[];
   notifications: Notification[];
@@ -103,7 +107,7 @@ export interface AuthContextType {
   systemLists: SystemLists;
   login: (email: string, password: string) => boolean;
   logout: () => void;
-  switchRole: (role: Role) => void;
+  switchRole: (role: string) => void;
   addRequest: (req: Omit<PaymentRequest, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'editCount'>) => void;
   editRequest: (id: string, updatedData: Partial<PaymentRequest>) => void;
   updateRequestStatus: (id: string, status: RequestStatus, remarks?: string) => void;

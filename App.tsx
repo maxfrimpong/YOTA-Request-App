@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
@@ -17,6 +18,7 @@ const DashboardRouter = () => {
 
   if (!user || !activeRole) return <Navigate to="/login" />;
 
+  // Using string comparison for roles
   switch (activeRole) {
     case Role.STAFF:
       return <StaffDashboard />;
@@ -29,7 +31,10 @@ const DashboardRouter = () => {
     case Role.AUDITOR:
       return <AuditorDashboard />;
     default:
-      return <div>Unknown Role</div>;
+      // Fallback for custom roles or unmapped roles
+      // For now, default to Staff Dashboard if role is unknown, or show an error
+      // A safe default is StaffDashboard to allow basic interaction
+      return <StaffDashboard />;
   }
 };
 

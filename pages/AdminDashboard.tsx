@@ -1,47 +1,10 @@
 
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { RequestStatus, Role, User, SystemLists } from '../types';
 import { Users, LayoutDashboard, UserPlus, X, Shield, Briefcase, Mail, Key, Edit2, Settings, Upload, Image as ImageIcon, Plus, Trash2, List, Save, XCircle, Undo2 } from 'lucide-react';
-
-const DEPARTMENTS = [
-  "Finance", 
-  "Projects", 
-  "Operations & Logistics", 
-  "Digital Engagement", 
-  "IT", 
-  "Skills Hub", 
-  "Get Into Employment", 
-  "HR & Admin"
-];
-
-const POSITIONS = [
-  "Executive Director", 
-  "Skills & Innovation Manager", 
-  "Project Manager", 
-  "Project Associate", 
-  "Project Officer", 
-  "Finance Manager", 
-  "Finance Officer", 
-  "Finance Associate", 
-  "Digital Engagement Manager", 
-  "Digital Engagement Analyst", 
-  "Digital Engagement Associate", 
-  "IT Manager",
-  "IT Officer",
-  "IT Associate", 
-  "Operations Manager", 
-  "Operations Support Officer", 
-  "Driver", 
-  "Senior Driver", 
-  "Security", 
-  "Senior Housekeeper", 
-  "Housekeeper", 
-  "Senior Security Officer", 
-  "Security Officer", 
-  "Intern"
-];
 
 const ListManager = ({ title, items = [], onUpdate }: { title: string, items: string[], onUpdate: (newItems: string[]) => void }) => {
     const [newItem, setNewItem] = useState('');
@@ -234,8 +197,8 @@ export const AdminDashboard = () => {
   const [newEmail, setNewEmail] = useState('');
   const [newDepartment, setNewDepartment] = useState('');
   const [newPosition, setNewPosition] = useState('');
-  // Roles are now an array
-  const [newRoles, setNewRoles] = useState<Role[]>([]);
+  // Roles are now an array of strings
+  const [newRoles, setNewRoles] = useState<string[]>([]);
   const [newPassword, setNewPassword] = useState('');
 
   // Calculate Totals
@@ -284,7 +247,7 @@ export const AdminDashboard = () => {
     setIsUserModalOpen(true);
   };
 
-  const toggleRole = (role: Role) => {
+  const toggleRole = (role: string) => {
     setNewRoles(prev => {
         if (prev.includes(role)) {
             return prev.filter(r => r !== role);
@@ -580,6 +543,21 @@ export const AdminDashboard = () => {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <ListManager 
+                            title="Departments" 
+                            items={systemLists.departments} 
+                            onUpdate={(newList) => updateSystemList('departments', newList)}
+                        />
+                        <ListManager 
+                            title="Positions" 
+                            items={systemLists.positions} 
+                            onUpdate={(newList) => updateSystemList('positions', newList)}
+                        />
+                        <ListManager 
+                            title="User Roles" 
+                            items={systemLists.roles} 
+                            onUpdate={(newList) => updateSystemList('roles', newList)}
+                        />
+                        <ListManager 
                             title="Currencies (Amount)" 
                             items={systemLists.currencies} 
                             onUpdate={(newList) => updateSystemList('currencies', newList)}
@@ -652,7 +630,7 @@ export const AdminDashboard = () => {
                                     onChange={e => setNewDepartment(e.target.value)} 
                                 >
                                     <option value="">Select Dept</option>
-                                    {DEPARTMENTS.map(dept => (
+                                    {systemLists.departments.map(dept => (
                                         <option key={dept} value={dept}>{dept}</option>
                                     ))}
                                 </select>
@@ -667,7 +645,7 @@ export const AdminDashboard = () => {
                                 onChange={e => setNewPosition(e.target.value)} 
                             >
                                 <option value="">Select Position</option>
-                                {POSITIONS.map(pos => (
+                                {systemLists.positions.map(pos => (
                                     <option key={pos} value={pos}>{pos}</option>
                                 ))}
                             </select>
@@ -676,8 +654,8 @@ export const AdminDashboard = () => {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Assign Roles</label>
-                        <div className="bg-gray-50 p-4 rounded-md border border-gray-200 space-y-2">
-                             {[Role.STAFF, Role.AUTHORIZER, Role.APPROVER, Role.ADMIN, Role.AUDITOR].map((role) => (
+                        <div className="bg-gray-50 p-4 rounded-md border border-gray-200 space-y-2 h-40 overflow-y-auto custom-scrollbar">
+                             {systemLists.roles.map((role) => (
                                  <label key={role} className="flex items-center space-x-3 cursor-pointer">
                                      <input 
                                         type="checkbox" 
