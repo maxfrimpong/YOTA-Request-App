@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { RequestStatus, Role, User, SystemLists } from '../types';
-import { Users, LayoutDashboard, UserPlus, X, Shield, Briefcase, Mail, Key, Edit2, Settings, Upload, Image as ImageIcon, Plus, Trash2, List, Save, XCircle, Undo2 } from 'lucide-react';
+import { Users, LayoutDashboard, UserPlus, X, Shield, Briefcase, Mail, Key, Edit2, Settings, Upload, Image as ImageIcon, Plus, Trash2, List, Save, XCircle, Undo2, ToggleLeft, ToggleRight } from 'lucide-react';
 
 const ListManager = ({ title, items = [], onUpdate }: { title: string, items: string[], onUpdate: (newItems: string[]) => void }) => {
     const [newItem, setNewItem] = useState('');
@@ -187,7 +187,7 @@ const ListManager = ({ title, items = [], onUpdate }: { title: string, items: st
 };
 
 export const AdminDashboard = () => {
-  const { requests, users, addUser, editUser, updateLogo, logoUrl, systemLists, updateSystemList } = useApp();
+  const { requests, users, addUser, editUser, updateLogo, logoUrl, systemLists, updateSystemList, showDemoCredentials, toggleDemoCredentials } = useApp();
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'settings'>('overview');
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
@@ -530,6 +530,30 @@ export const AdminDashboard = () => {
                                 <p className="text-sm text-gray-500">Click or drag file to upload</p>
                             </div>
                         </div>
+                    </div>
+               </div>
+               
+               {/* Login Configuration */}
+               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <Settings size={20} className="text-brand-teal" />
+                        Login Configuration
+                    </h3>
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div>
+                            <h4 className="font-bold text-gray-800">Demo Credentials</h4>
+                            <p className="text-sm text-gray-500">Show a list of test accounts and passwords on the login screen for demonstration purposes.</p>
+                        </div>
+                        <button 
+                            onClick={() => toggleDemoCredentials(!showDemoCredentials)}
+                            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${showDemoCredentials ? 'bg-brand-teal' : 'bg-gray-200'}`}
+                        >
+                            <span className="sr-only">Use setting</span>
+                            <span 
+                                aria-hidden="true" 
+                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${showDemoCredentials ? 'translate-x-5' : 'translate-x-0'}`}
+                            />
+                        </button>
                     </div>
                </div>
 

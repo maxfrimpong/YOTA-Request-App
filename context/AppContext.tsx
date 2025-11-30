@@ -43,6 +43,7 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
   const [logoUrl, setLogoUrl] = useState<string>('logo.png');
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
   const [systemLists, setSystemLists] = useState<SystemLists>(DEFAULT_LISTS);
+  const [showDemoCredentials, setShowDemoCredentials] = useState<boolean>(true);
   
   // Simulate persistent login, logo, and lists
   useEffect(() => {
@@ -68,6 +69,11 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
             ...prev,
             ...JSON.parse(storedLists)
         }));
+    }
+
+    const storedDemoShow = localStorage.getItem('sendreq_show_demo');
+    if (storedDemoShow !== null) {
+        setShowDemoCredentials(JSON.parse(storedDemoShow));
     }
 
     // Simulate online users
@@ -125,6 +131,11 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
           localStorage.setItem('sendreq_lists', JSON.stringify(updated));
           return updated;
       });
+  };
+
+  const toggleDemoCredentials = (show: boolean) => {
+      setShowDemoCredentials(show);
+      localStorage.setItem('sendreq_show_demo', JSON.stringify(show));
   };
 
   const createNotification = (userId: string, message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') => {
@@ -311,9 +322,9 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
 
   return (
     <AppContext.Provider value={{ 
-      user, activeRole, users, requests, notifications, messages, logoUrl, onlineUserIds, systemLists,
+      user, activeRole, users, requests, notifications, messages, logoUrl, onlineUserIds, systemLists, showDemoCredentials,
       login, logout, switchRole, addRequest, editRequest, updateRequestStatus, addUser, editUser,
-      markAsRead, markAllAsRead, sendMessage, markChatAsRead, updateLogo, updateSystemList
+      markAsRead, markAllAsRead, sendMessage, markChatAsRead, updateLogo, updateSystemList, toggleDemoCredentials
     }}>
       {children}
     </AppContext.Provider>

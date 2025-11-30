@@ -105,6 +105,7 @@ export interface AuthContextType {
   logoUrl: string;
   onlineUserIds: string[];
   systemLists: SystemLists;
+  showDemoCredentials: boolean;
   login: (email: string, password: string) => boolean;
   logout: () => void;
   switchRole: (role: string) => void;
@@ -119,4 +120,5 @@ export interface AuthContextType {
   markChatAsRead: (senderId: string) => void;
   updateLogo: (url: string) => void;
   updateSystemList: (listName: keyof SystemLists, newList: string[]) => void;
+  toggleDemoCredentials: (show: boolean) => void;
 }

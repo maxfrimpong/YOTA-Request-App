@@ -1,9 +1,11 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 
 export const Login = () => {
-  const { login, user, logoUrl } = useApp();
+  const { login, user, logoUrl, showDemoCredentials } = useApp();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -81,23 +83,25 @@ export const Login = () => {
               </button>
             </form>
 
-            <div className="mt-8 pt-6 border-t border-gray-100">
-              <p className="text-xs text-gray-500 mb-3 text-center">Demo Credentials (Password: <strong>password123</strong>):</p>
-              <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-                <button onClick={() => { setEmail('alice@org.com'); setPassword('password123'); }} className="p-2 bg-gray-50 hover:bg-gray-100 rounded text-left transition-colors">
-                    <strong>Staff:</strong> alice@org.com
-                </button>
-                <button onClick={() => { setEmail('charlie@org.com'); setPassword('password123'); }} className="p-2 bg-gray-50 hover:bg-gray-100 rounded text-left transition-colors">
-                    <strong>Auth:</strong> charlie@org.com
-                </button>
-                <button onClick={() => { setEmail('eve@org.com'); setPassword('password123'); }} className="p-2 bg-gray-50 hover:bg-gray-100 rounded text-left transition-colors">
-                    <strong>Exec:</strong> eve@org.com
-                </button>
-                <button onClick={() => { setEmail('admin@org.com'); setPassword('password123'); }} className="p-2 bg-gray-50 hover:bg-gray-100 rounded text-left transition-colors">
-                    <strong>Admin:</strong> admin@org.com
-                </button>
+            {showDemoCredentials && (
+              <div className="mt-8 pt-6 border-t border-gray-100">
+                <p className="text-xs text-gray-500 mb-3 text-center">Demo Credentials (Password: <strong>password123</strong>):</p>
+                <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                  <button onClick={() => { setEmail('alice@org.com'); setPassword('password123'); }} className="p-2 bg-gray-50 hover:bg-gray-100 rounded text-left transition-colors">
+                      <strong>Staff:</strong> alice@org.com
+                  </button>
+                  <button onClick={() => { setEmail('charlie@org.com'); setPassword('password123'); }} className="p-2 bg-gray-50 hover:bg-gray-100 rounded text-left transition-colors">
+                      <strong>Auth:</strong> charlie@org.com
+                  </button>
+                  <button onClick={() => { setEmail('eve@org.com'); setPassword('password123'); }} className="p-2 bg-gray-50 hover:bg-gray-100 rounded text-left transition-colors">
+                      <strong>Exec:</strong> eve@org.com
+                  </button>
+                  <button onClick={() => { setEmail('admin@org.com'); setPassword('password123'); }} className="p-2 bg-gray-50 hover:bg-gray-100 rounded text-left transition-colors">
+                      <strong>Admin:</strong> admin@org.com
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
       </div>
 
