@@ -18,14 +18,14 @@ export const ChatWidget = () => {
   const otherUsers = users.filter(u => u.id !== user.id && u.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   // Get unread counts per user
-  const unreadCounts = messages.reduce((acc, msg) => {
+  const unreadCounts = messages.reduce((acc: Record<string, number>, msg) => {
     if (msg.receiverId === user.id && !msg.isRead) {
       acc[msg.senderId] = (acc[msg.senderId] || 0) + 1;
     }
     return acc;
   }, {} as Record<string, number>);
 
-  const totalUnread = Object.values(unreadCounts).reduce((a, b) => a + b, 0);
+  const totalUnread = (Object.values(unreadCounts) as number[]).reduce((a: number, b: number) => a + b, 0);
 
   // Get messages for active chat
   const activeMessages = activeChatUser 
@@ -141,7 +141,7 @@ export const ChatWidget = () => {
                                 {isOnline && (
                                     <span className="absolute bottom-0 right-0 bg-green-500 h-3 w-3 rounded-full border-2 border-white" title="Online"></span>
                                 )}
-                                {unreadCounts[u.id] > 0 && (
+                                {(unreadCounts[u.id] || 0) > 0 && (
                                 <span className="absolute -top-1 -right-1 bg-brand-orange text-white text-[10px] h-4 w-4 flex items-center justify-center rounded-full border border-white">
                                     {unreadCounts[u.id]}
                                 </span>

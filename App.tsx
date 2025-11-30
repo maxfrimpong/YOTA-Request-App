@@ -29,7 +29,7 @@ const DashboardRouter = () => {
   }
 };
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
   const { user } = useApp();
   if (!user) {
     return <Navigate to="/login" replace />;

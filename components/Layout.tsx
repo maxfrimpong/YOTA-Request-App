@@ -6,7 +6,7 @@ import { LogOut, LayoutDashboard, RefreshCw, Bell, Check, X, User as UserIcon } 
 import { Link, useLocation } from 'react-router-dom';
 import { ChatWidget } from './ChatWidget';
 
-export const Layout = ({ children }: { children: React.ReactNode }) => {
+export const Layout = ({ children }: { children?: React.ReactNode }) => {
   const { user, activeRole, switchRole, logout, notifications, markAsRead, markAllAsRead, logoUrl } = useApp();
   const location = useLocation();
   const [showNotifications, setShowNotifications] = useState(false);

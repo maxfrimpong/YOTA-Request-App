@@ -16,7 +16,7 @@ const DEFAULT_LISTS: SystemLists = {
   momoOperators: ['MTN Momo', 'Telecel Cash', 'AT Cash']
 };
 
-export const AppProvider = ({ children }: { children: ReactNode }) => {
+export const AppProvider = ({ children }: { children?: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [activeRole, setActiveRole] = useState<Role | null>(null);
   const [requests, setRequests] = useState<PaymentRequest[]>(MOCK_REQUESTS);

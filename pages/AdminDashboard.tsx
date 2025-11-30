@@ -1,9 +1,9 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { RequestStatus, Role, User, SystemLists } from '../types';
-import { Users, LayoutDashboard, UserPlus, X, Shield, Briefcase, Mail, Key, Edit2, Settings, Upload, Image as ImageIcon, Plus, Trash2, List, Save, XCircle } from 'lucide-react';
+import { Users, LayoutDashboard, UserPlus, X, Shield, Briefcase, Mail, Key, Edit2, Settings, Upload, Image as ImageIcon, Plus, Trash2, List, Save, XCircle, Undo2 } from 'lucide-react';
 
 const DEPARTMENTS = [
   "Finance", 
@@ -43,10 +43,14 @@ const POSITIONS = [
   "Intern"
 ];
 
-const ListManager = ({ title, items, onUpdate }: { title: string, items: string[], onUpdate: (newItems: string[]) => void }) => {
+const ListManager = ({ title, items = [], onUpdate }: { title: string, items: string[], onUpdate: (newItems: string[]) => void }) => {
     const [newItem, setNewItem] = useState('');
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [editValue, setEditValue] = useState('');
+    
+    // Undo State
+    const [deletedItem, setDeletedItem] = useState<{ val: string, idx: number } | null>(null);
+    const undoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const handleAdd = () => {
         const trimmed = newItem.trim();
@@ -57,9 +61,35 @@ const ListManager = ({ title, items, onUpdate }: { title: string, items: string[
     };
 
     const handleDelete = (index: number) => {
-        if (window.confirm(`Are you sure you want to delete "${items[index]}"?`)) {
-            const newItems = items.filter((_, i) => i !== index);
+        const itemToDelete = items[index];
+        
+        // Create a copy and splice to remove the item at the specific index
+        const newItems = [...items];
+        newItems.splice(index, 1);
+        onUpdate(newItems);
+
+        // Set undo state
+        setDeletedItem({ val: itemToDelete, idx: index });
+
+        // Clear existing timeout
+        if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
+
+        // Auto-dismiss undo after 5 seconds
+        undoTimeoutRef.current = setTimeout(() => {
+            setDeletedItem(null);
+        }, 5000);
+    };
+
+    const handleUndo = () => {
+        if (deletedItem) {
+            const newItems = [...items];
+            // Restore item to its original index (safe even if index is OOB, splice appends)
+            newItems.splice(deletedItem.idx, 0, deletedItem.val);
             onUpdate(newItems);
+            
+            // Clear undo state
+            setDeletedItem(null);
+            if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
         }
     };
 
@@ -92,12 +122,33 @@ const ListManager = ({ title, items, onUpdate }: { title: string, items: string[
         }
     };
 
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
+        };
+    }, []);
+
     return (
-        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col h-full">
+        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col h-full transition-all">
             <h4 className="font-bold text-gray-700 mb-3 text-sm uppercase tracking-wide flex items-center">
                 <List size={14} className="mr-2" /> {title}
             </h4>
             
+            {/* Undo Notification */}
+            {deletedItem && (
+                <div className="mb-3 bg-gray-800 text-white text-xs py-2 px-3 rounded shadow-md flex justify-between items-center animate-in fade-in slide-in-from-top-2">
+                    <span className="truncate mr-2">Deleted <span className="font-semibold">"{deletedItem.val}"</span></span>
+                    <button 
+                        type="button"
+                        onClick={handleUndo} 
+                        className="flex items-center font-bold text-brand-teal hover:text-white shrink-0 transition-colors"
+                    >
+                        <Undo2 size={14} className="mr-1"/> Undo
+                    </button>
+                </div>
+            )}
+
             {/* Add Item Input */}
             <div className="flex space-x-2 mb-3">
                 <input 
@@ -121,7 +172,8 @@ const ListManager = ({ title, items, onUpdate }: { title: string, items: string[
             <div className="flex-1 overflow-y-auto max-h-40 space-y-1 pr-1 custom-scrollbar">
                 {items.length === 0 && <p className="text-xs text-gray-400 italic">No items yet.</p>}
                 {items.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center bg-white p-2 rounded border border-gray-100 text-sm group min-h-[40px]">
+                    // Using item as key assuming uniqueness, which handleAdd enforces
+                    <div key={item} className="flex justify-between items-center bg-white p-2 rounded border border-gray-100 text-sm group min-h-[40px] hover:border-gray-300 transition-colors">
                         {editingIndex === index ? (
                             <div className="flex flex-1 items-center space-x-2">
                                 <input 
@@ -140,20 +192,23 @@ const ListManager = ({ title, items, onUpdate }: { title: string, items: string[
                             </div>
                         ) : (
                             <>
-                                <span className="text-gray-700 flex-1 truncate mr-2" title={item}>{item}</span>
+                                <span className="text-gray-700 flex-1 truncate mr-2 select-none" title={item}>{item}</span>
                                 <div className="flex space-x-1 items-center">
                                     <button 
                                         type="button"
                                         onClick={() => startEdit(index, item)}
-                                        className="text-gray-400 hover:text-brand-teal p-1 rounded transition-colors"
+                                        className="text-gray-400 hover:text-brand-teal p-1.5 rounded hover:bg-teal-50 transition-colors"
                                         title="Rename"
                                     >
                                         <Edit2 size={14} />
                                     </button>
                                     <button 
                                         type="button"
-                                        onClick={() => handleDelete(index)}
-                                        className="text-gray-400 hover:text-red-500 p-1 rounded transition-colors"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDelete(index);
+                                        }}
+                                        className="text-gray-400 hover:text-red-600 p-1.5 rounded hover:bg-red-50 transition-colors"
                                         title="Delete"
                                     >
                                         <Trash2 size={14} />
