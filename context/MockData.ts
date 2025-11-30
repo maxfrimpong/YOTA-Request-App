@@ -24,6 +24,11 @@ export const MOCK_REQUESTS: PaymentRequest[] = [
     billingProject: 'YOTA Main',
     requestSubject: 'Q3 Marketing Material Printing',
     description: 'Printing of Q3 marketing brochures and flyers for the upcoming trade show.',
+    billingItems: [
+        { description: 'Tri-fold Brochures', unitCost: 500, quantity: 1, frequency: 1 },
+        { description: 'Flyers (A5)', unitCost: 750, quantity: 1, frequency: 1 }
+    ],
+    withholdingTaxPercentage: 0,
     files: [{ name: 'invoice_101.pdf', type: 'invoice', url: '#' }, { name: 'approval_memo.docx', type: 'memo', url: '#' }],
     authorizerId: 'u3',
     status: RequestStatus.PENDING_AUTHORIZATION,
@@ -45,6 +50,10 @@ export const MOCK_REQUESTS: PaymentRequest[] = [
     billingProject: 'Skills Hub',
     requestSubject: 'Monthly Server Hosting',
     description: 'Monthly server hosting fee for the main website.',
+    billingItems: [
+        { description: 'Dedicated Server Rental', unitCost: 450, quantity: 1, frequency: 1 }
+    ],
+    withholdingTaxPercentage: 0,
     files: [{ name: 'inv_jan.pdf', type: 'invoice', url: '#' }],
     authorizerId: 'u4',
     status: RequestStatus.AUTHORIZED,
@@ -66,6 +75,8 @@ export const MOCK_REQUESTS: PaymentRequest[] = [
     billingProject: 'Youth Excel',
     requestSubject: 'Gala Dinner Decoration',
     description: 'Decoration services for the annual gala dinner.',
+    billingItems: [],
+    withholdingTaxPercentage: 0,
     files: [],
     authorizerId: 'u3',
     status: RequestStatus.APPROVED,

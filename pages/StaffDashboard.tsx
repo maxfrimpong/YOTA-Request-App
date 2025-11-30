@@ -1,8 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { RequestStatus, Role, RequestFile, PaymentRequest } from '../types';
-import { PlusCircle, Upload, CheckCircle, XCircle, Clock, AlertCircle, Eye, FileText, Download, X, Edit3, CreditCard, Smartphone, Landmark, Briefcase, FileType } from 'lucide-react';
+import { RequestStatus, Role, RequestFile, PaymentRequest, BillingItem } from '../types';
+import { PlusCircle, Upload, CheckCircle, XCircle, Clock, AlertCircle, Eye, FileText, Download, X, Edit3, CreditCard, Smartphone, Landmark, Briefcase, FileType, Plus, Trash2 } from 'lucide-react';
 
 export const StaffDashboard = () => {
   const { user, requests, users, addRequest, editRequest, systemLists } = useApp();
@@ -24,6 +24,15 @@ export const StaffDashboard = () => {
   const [selectedAuthorizer, setSelectedAuthorizer] = useState('');
   const [signOff, setSignOff] = useState('');
   const [files, setFiles] = useState<{name: string, type: 'memo'|'invoice'|'other'}[]>([]);
+
+  // Billing Items Table State
+  const [billingItems, setBillingItems] = useState<BillingItem[]>([
+      { description: '', unitCost: 0, quantity: 1, frequency: 1 }
+  ]);
+  const [whtPercentage, setWhtPercentage] = useState<string>('0');
+  const [calculatedSubTotal, setCalculatedSubTotal] = useState(0);
+  const [calculatedWhtAmount, setCalculatedWhtAmount] = useState(0);
+  const [calculatedGrandTotal, setCalculatedGrandTotal] = useState(0);
 
   // Payment Details State
   const [paymentMethod, setPaymentMethod] = useState(''); // Initialized empty, set in useEffect
@@ -64,11 +73,53 @@ export const StaffDashboard = () => {
       }
   }, [systemLists]);
 
+  // Calculations for Billing Table
+  useEffect(() => {
+    const subTotal = billingItems.reduce((acc, item) => {
+        return acc + (item.unitCost * item.quantity * item.frequency);
+    }, 0);
+
+    const taxP = parseFloat(whtPercentage) || 0;
+    const taxAmt = subTotal * (taxP / 100);
+    const grandTotal = subTotal - taxAmt; // WHT is deducted from total payable
+
+    setCalculatedSubTotal(subTotal);
+    setCalculatedWhtAmount(taxAmt);
+    setCalculatedGrandTotal(grandTotal);
+
+    // Update main amount if items exist
+    if (subTotal > 0) {
+        setAmount(grandTotal.toFixed(2));
+    }
+  }, [billingItems, whtPercentage]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'memo' | 'invoice') => {
     if (e.target.files && e.target.files[0]) {
       const fileName = e.target.files[0].name;
       setFiles(prev => [...prev, { name: fileName, type }]);
     }
+  };
+
+  const handleBillingItemChange = (index: number, field: keyof BillingItem, value: string) => {
+      const newItems = [...billingItems];
+      if (field === 'description') {
+          newItems[index][field] = value;
+      } else {
+          newItems[index][field] = parseFloat(value) || 0;
+      }
+      setBillingItems(newItems);
+  };
+
+  const addBillingItem = () => {
+      setBillingItems([...billingItems, { description: '', unitCost: 0, quantity: 1, frequency: 1 }]);
+  };
+
+  const removeBillingItem = (index: number) => {
+      if (billingItems.length > 1) {
+        const newItems = [...billingItems];
+        newItems.splice(index, 1);
+        setBillingItems(newItems);
+      }
   };
 
   const handleOpenNewRequest = () => {
@@ -88,6 +139,14 @@ export const StaffDashboard = () => {
       setSelectedAuthorizer(req.authorizerId);
       setSignOff(req.signOff);
       setFiles(req.files.map(f => ({ name: f.name, type: f.type })));
+      
+      // Billing items
+      if (req.billingItems && req.billingItems.length > 0) {
+          setBillingItems(req.billingItems);
+      } else {
+          setBillingItems([{ description: '', unitCost: 0, quantity: 1, frequency: 1 }]);
+      }
+      setWhtPercentage(req.withholdingTaxPercentage ? req.withholdingTaxPercentage.toString() : '0');
 
       // Attempt to parse payment details
       const details = req.paymentDetails || '';
@@ -161,24 +220,31 @@ export const StaffDashboard = () => {
     } else {
         finalPaymentDetails = `${paymentMethod} - ${genericPaymentDetails}`;
     }
+    
+    // Filter out empty billing items
+    const validBillingItems = billingItems.filter(item => item.description.trim() !== '');
 
     setLoading(true);
     // Simulate API delay
     setTimeout(() => {
-      if (editingRequestId) {
-        // Edit Mode
-        editRequest(editingRequestId, {
+      const commonData = {
             vendorName: vendor,
             amount: parseFloat(amount),
             currency,
             billingProject,
             requestSubject,
             description,
+            billingItems: validBillingItems,
+            withholdingTaxPercentage: parseFloat(whtPercentage),
             paymentDetails: finalPaymentDetails,
             authorizerId: selectedAuthorizer,
             signOff,
             files: files.map(f => ({ ...f, url: '#' })) 
-        });
+      };
+
+      if (editingRequestId) {
+        // Edit Mode
+        editRequest(editingRequestId, commonData);
       } else {
         // Create Mode
         addRequest({
@@ -186,16 +252,7 @@ export const StaffDashboard = () => {
             requesterName: user.name,
             department: user.department,
             position: user.position || 'Staff',
-            vendorName: vendor,
-            paymentDetails: finalPaymentDetails,
-            amount: parseFloat(amount),
-            currency,
-            billingProject,
-            requestSubject,
-            description,
-            files: files.map(f => ({ ...f, url: '#' })),
-            authorizerId: selectedAuthorizer,
-            signOff
+            ...commonData
         });
       }
 
@@ -216,6 +273,11 @@ export const StaffDashboard = () => {
     setSignOff('');
     setFiles([]);
     setEditingRequestId(null);
+    setBillingItems([{ description: '', unitCost: 0, quantity: 1, frequency: 1 }]);
+    setWhtPercentage('0');
+    setCalculatedSubTotal(0);
+    setCalculatedWhtAmount(0);
+    setCalculatedGrandTotal(0);
     
     // Reset Payment fields
     setPaymentMethod(systemLists.paymentMethods[0] || '');
@@ -409,6 +471,59 @@ export const StaffDashboard = () => {
                             {selectedRequest.description}
                         </div>
                      </div>
+
+                     {/* Display Billing Items if available */}
+                     {selectedRequest.billingItems && selectedRequest.billingItems.length > 0 && (
+                         <div>
+                             <label className="block text-sm font-medium text-gray-500 mb-2">Billing Items</label>
+                             <div className="border border-gray-200 rounded-lg overflow-hidden">
+                                 <table className="min-w-full divide-y divide-gray-200">
+                                     <thead className="bg-gray-50">
+                                         <tr>
+                                             <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
+                                             <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Unit Cost</th>
+                                             <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Qty</th>
+                                             <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Freq</th>
+                                             <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                                         </tr>
+                                     </thead>
+                                     <tbody className="divide-y divide-gray-200 bg-white">
+                                         {selectedRequest.billingItems.map((item, idx) => (
+                                             <tr key={idx}>
+                                                 <td className="px-3 py-2 text-sm text-gray-900">{item.description}</td>
+                                                 <td className="px-3 py-2 text-sm text-gray-500 text-right">{item.unitCost.toLocaleString()}</td>
+                                                 <td className="px-3 py-2 text-sm text-gray-500 text-right">{item.quantity}</td>
+                                                 <td className="px-3 py-2 text-sm text-gray-500 text-right">{item.frequency}</td>
+                                                 <td className="px-3 py-2 text-sm text-gray-900 text-right">{(item.unitCost * item.quantity * item.frequency).toLocaleString()}</td>
+                                             </tr>
+                                         ))}
+                                         {/* Calculation Footer */}
+                                         {(() => {
+                                             const subTotal = selectedRequest.billingItems.reduce((acc, i) => acc + (i.unitCost * i.quantity * i.frequency), 0);
+                                             const tax = subTotal * ((selectedRequest.withholdingTaxPercentage || 0) / 100);
+                                             const grandTotal = subTotal - tax;
+                                             return (
+                                                <>
+                                                 <tr className="bg-gray-50 font-medium">
+                                                     <td colSpan={4} className="px-3 py-2 text-right text-sm">Sub-Total</td>
+                                                     <td className="px-3 py-2 text-right text-sm">{selectedRequest.currency} {subTotal.toLocaleString()}</td>
+                                                 </tr>
+                                                 <tr className="bg-gray-50">
+                                                     <td colSpan={4} className="px-3 py-2 text-right text-sm text-gray-500">Withholding Tax ({selectedRequest.withholdingTaxPercentage || 0}%)</td>
+                                                     <td className="px-3 py-2 text-right text-sm text-red-500">-{selectedRequest.currency} {tax.toLocaleString()}</td>
+                                                 </tr>
+                                                 <tr className="bg-gray-100 font-bold border-t border-gray-200">
+                                                     <td colSpan={4} className="px-3 py-2 text-right text-sm">Grand Total Due</td>
+                                                     <td className="px-3 py-2 text-right text-sm text-brand-teal">{selectedRequest.currency} {grandTotal.toLocaleString()}</td>
+                                                 </tr>
+                                                </>
+                                             )
+                                         })()}
+                                     </tbody>
+                                 </table>
+                             </div>
+                         </div>
+                     )}
                      
                      {selectedRequest.remarks && (
                          <div className="bg-red-50 border border-red-100 rounded-lg p-4">
@@ -456,7 +571,7 @@ export const StaffDashboard = () => {
       {isFormOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50">
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl relative">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl relative">
                 <div className="flex justify-between items-center p-6 border-b">
                 <h3 className="text-xl font-bold text-gray-900">{editingRequestId ? 'Edit Request' : 'New Cash Payment Request'}</h3>
                 <button onClick={() => setIsFormOpen(false)} className="text-gray-400 hover:text-gray-600">
@@ -483,8 +598,8 @@ export const StaffDashboard = () => {
                                 <option key={c} value={c}>{c}</option>
                             ))}
                         </select>
-                        <input required type="number" step="0.01" className="block w-full rounded-r-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
-                            value={amount} onChange={e => setAmount(e.target.value)} />
+                        <input required type="number" step="0.01" className="block w-full rounded-r-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal bg-gray-50 text-gray-600 cursor-not-allowed"
+                            value={amount} readOnly title="Amount is calculated from Billing Items" />
                     </div>
                     </div>
 
@@ -525,6 +640,127 @@ export const StaffDashboard = () => {
                                 onChange={e => setRequestSubject(e.target.value)} 
                             />
                         </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Description / Memo Content</label>
+                    <textarea required rows={4} className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
+                    placeholder="Explain the purpose of this payment..."
+                    value={description} onChange={e => setDescription(e.target.value)} />
+                </div>
+
+                {/* Editable Billing Items Table */}
+                <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+                    <div className="p-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+                        <h4 className="text-sm font-bold text-gray-800">Billing Items</h4>
+                        <button type="button" onClick={addBillingItem} className="text-xs flex items-center bg-brand-teal text-white px-2 py-1 rounded hover:bg-[#008f7a]">
+                            <Plus size={14} className="mr-1"/> Add Item
+                        </button>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Item Description</th>
+                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Cost ({currency})</th>
+                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
+                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Freq</th>
+                                    <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total ({currency})</th>
+                                    <th className="px-4 py-2 w-10"></th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {billingItems.map((item, index) => (
+                                    <tr key={index}>
+                                        <td className="px-4 py-2">
+                                            <input 
+                                                type="text" 
+                                                placeholder="Item name"
+                                                className="w-full border-0 border-b border-transparent focus:border-brand-teal focus:ring-0 text-sm p-1"
+                                                value={item.description}
+                                                onChange={(e) => handleBillingItemChange(index, 'description', e.target.value)}
+                                            />
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            <input 
+                                                type="number" 
+                                                min="0"
+                                                step="0.01"
+                                                className="w-full border-gray-200 rounded text-sm p-1 focus:ring-brand-teal focus:border-brand-teal"
+                                                value={item.unitCost}
+                                                onChange={(e) => handleBillingItemChange(index, 'unitCost', e.target.value)}
+                                            />
+                                        </td>
+                                        <td className="px-4 py-2">
+                                             <input 
+                                                type="number" 
+                                                min="1"
+                                                className="w-20 border-gray-200 rounded text-sm p-1 focus:ring-brand-teal focus:border-brand-teal"
+                                                value={item.quantity}
+                                                onChange={(e) => handleBillingItemChange(index, 'quantity', e.target.value)}
+                                            />
+                                        </td>
+                                        <td className="px-4 py-2">
+                                             <input 
+                                                type="number" 
+                                                min="1"
+                                                className="w-20 border-gray-200 rounded text-sm p-1 focus:ring-brand-teal focus:border-brand-teal"
+                                                value={item.frequency}
+                                                onChange={(e) => handleBillingItemChange(index, 'frequency', e.target.value)}
+                                            />
+                                        </td>
+                                        <td className="px-4 py-2 text-right text-sm font-medium text-gray-900">
+                                            {(item.unitCost * item.quantity * item.frequency).toLocaleString()}
+                                        </td>
+                                        <td className="px-4 py-2 text-center">
+                                            {billingItems.length > 1 && (
+                                                <button type="button" onClick={() => removeBillingItem(index)} className="text-gray-400 hover:text-red-500">
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                            <tfoot className="bg-gray-50 border-t border-gray-200">
+                                <tr>
+                                    <td colSpan={4} className="px-4 py-2 text-right text-sm font-medium text-gray-700">Sub-Total</td>
+                                    <td className="px-4 py-2 text-right text-sm font-bold text-gray-900">{currency} {calculatedSubTotal.toLocaleString()}</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colSpan={4} className="px-4 py-2 text-right text-sm font-medium text-gray-700">
+                                        <div className="flex items-center justify-end space-x-2">
+                                            <span>Withholding Tax (%)</span>
+                                            <input 
+                                                type="number" 
+                                                min="0" 
+                                                max="100" 
+                                                step="0.1"
+                                                className="w-16 border-gray-300 rounded text-xs p-1 text-right focus:ring-brand-teal focus:border-brand-teal"
+                                                value={whtPercentage}
+                                                onChange={(e) => setWhtPercentage(e.target.value)}
+                                            />
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-2 text-right text-sm font-medium text-red-500">
+                                        - {currency} {calculatedWhtAmount.toLocaleString()}
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colSpan={4} className="px-4 py-2 text-right text-sm font-medium text-gray-700">Sub-Total after Withholding Tax</td>
+                                    <td className="px-4 py-2 text-right text-sm font-bold text-gray-800">{currency} {calculatedGrandTotal.toLocaleString()}</td>
+                                    <td></td>
+                                </tr>
+                                <tr className="bg-brand-teal/5">
+                                    <td colSpan={4} className="px-4 py-3 text-right text-sm font-bold text-brand-teal uppercase">Grand Total Due</td>
+                                    <td className="px-4 py-3 text-right text-base font-bold text-brand-teal">{currency} {calculatedGrandTotal.toLocaleString()}</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
                 </div>
 
@@ -653,12 +889,6 @@ export const StaffDashboard = () => {
                     )}
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Description / Memo Content</label>
-                    <textarea required rows={4} className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal"
-                    placeholder="Explain the purpose of this payment..."
-                    value={description} onChange={e => setDescription(e.target.value)} />
-                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer"

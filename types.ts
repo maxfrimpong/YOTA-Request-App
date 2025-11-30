@@ -32,6 +32,13 @@ export interface RequestFile {
   url: string; // Mock URL
 }
 
+export interface BillingItem {
+  description: string;
+  unitCost: number;
+  quantity: number;
+  frequency: number;
+}
+
 export interface PaymentRequest {
   id: string;
   requesterId: string;
@@ -45,6 +52,8 @@ export interface PaymentRequest {
   billingProject: string; // New field
   requestSubject: string; // New field
   description: string;
+  billingItems?: BillingItem[]; // New field for line items
+  withholdingTaxPercentage?: number; // New field for tax calculation
   files: RequestFile[];
   authorizerId: string;
   status: RequestStatus;

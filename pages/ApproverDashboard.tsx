@@ -213,6 +213,57 @@ export const ApproverDashboard = () => {
                              <span className="text-gray-500">Original Description</span>
                              <div className="p-3 bg-gray-50 rounded border text-gray-600">{selectedRequest.description}</div>
                          </div>
+                         {/* Billing Items Table */}
+                         {selectedRequest.billingItems && selectedRequest.billingItems.length > 0 && (
+                         <div className="space-y-1 col-span-2">
+                             <label className="block text-sm text-gray-500 mb-2">Billing Items</label>
+                             <div className="border border-gray-200 rounded-lg overflow-hidden">
+                                 <table className="min-w-full divide-y divide-gray-200">
+                                     <thead className="bg-gray-50">
+                                         <tr>
+                                             <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
+                                             <th className="px-2 py-1 text-right text-xs font-medium text-gray-500 uppercase">Cost</th>
+                                             <th className="px-2 py-1 text-right text-xs font-medium text-gray-500 uppercase">Qty</th>
+                                             <th className="px-2 py-1 text-right text-xs font-medium text-gray-500 uppercase">Freq</th>
+                                             <th className="px-2 py-1 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                                         </tr>
+                                     </thead>
+                                     <tbody className="divide-y divide-gray-200 bg-white">
+                                         {selectedRequest.billingItems.map((item, idx) => (
+                                             <tr key={idx}>
+                                                 <td className="px-2 py-1 text-xs text-gray-900">{item.description}</td>
+                                                 <td className="px-2 py-1 text-xs text-gray-500 text-right">{item.unitCost.toLocaleString()}</td>
+                                                 <td className="px-2 py-1 text-xs text-gray-500 text-right">{item.quantity}</td>
+                                                 <td className="px-2 py-1 text-xs text-gray-500 text-right">{item.frequency}</td>
+                                                 <td className="px-2 py-1 text-xs text-gray-900 text-right">{(item.unitCost * item.quantity * item.frequency).toLocaleString()}</td>
+                                             </tr>
+                                         ))}
+                                         {(() => {
+                                             const subTotal = selectedRequest.billingItems.reduce((acc, i) => acc + (i.unitCost * i.quantity * i.frequency), 0);
+                                             const tax = subTotal * ((selectedRequest.withholdingTaxPercentage || 0) / 100);
+                                             const grandTotal = subTotal - tax;
+                                             return (
+                                                <>
+                                                 <tr className="bg-gray-50 font-medium">
+                                                     <td colSpan={4} className="px-2 py-1 text-right text-xs">Sub-Total</td>
+                                                     <td className="px-2 py-1 text-right text-xs">{selectedRequest.currency} {subTotal.toLocaleString()}</td>
+                                                 </tr>
+                                                 <tr className="bg-gray-50">
+                                                     <td colSpan={4} className="px-2 py-1 text-right text-xs text-gray-500">WHT ({selectedRequest.withholdingTaxPercentage || 0}%)</td>
+                                                     <td className="px-2 py-1 text-right text-xs text-red-500">-{selectedRequest.currency} {tax.toLocaleString()}</td>
+                                                 </tr>
+                                                 <tr className="bg-gray-100 font-bold border-t border-gray-200">
+                                                     <td colSpan={4} className="px-2 py-1 text-right text-xs">Grand Total</td>
+                                                     <td className="px-2 py-1 text-right text-xs text-brand-teal">{selectedRequest.currency} {grandTotal.toLocaleString()}</td>
+                                                 </tr>
+                                                </>
+                                             )
+                                         })()}
+                                     </tbody>
+                                 </table>
+                             </div>
+                         </div>
+                        )}
                          <div className="space-y-1 col-span-2">
                             <span className="text-gray-500 block text-sm mb-2">Attachments</span>
                             <div className="flex flex-wrap gap-2">
