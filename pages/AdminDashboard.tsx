@@ -512,6 +512,7 @@ export const AdminDashboard = () => {
                                                 ${r === Role.ADMIN ? 'bg-purple-100 text-purple-800' : 
                                                 r === Role.APPROVER ? 'bg-indigo-100 text-indigo-800' :
                                                 r === Role.AUTHORIZER ? 'bg-brand-dark/10 text-brand-dark' : 
+                                                r === Role.AUDITOR ? 'bg-green-100 text-green-800' :
                                                 'bg-gray-100 text-gray-800'}`}>
                                                 {r.replace('_', ' ')}
                                             </span>
@@ -676,7 +677,7 @@ export const AdminDashboard = () => {
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Assign Roles</label>
                         <div className="bg-gray-50 p-4 rounded-md border border-gray-200 space-y-2">
-                             {[Role.STAFF, Role.AUTHORIZER, Role.APPROVER, Role.ADMIN].map((role) => (
+                             {[Role.STAFF, Role.AUTHORIZER, Role.APPROVER, Role.ADMIN, Role.AUDITOR].map((role) => (
                                  <label key={role} className="flex items-center space-x-3 cursor-pointer">
                                      <input 
                                         type="checkbox" 
@@ -691,6 +692,7 @@ export const AdminDashboard = () => {
                                             {role === Role.AUTHORIZER && "Can authorize requests"}
                                             {role === Role.APPROVER && "Executive approval"}
                                             {role === Role.ADMIN && "System management"}
+                                            {role === Role.AUDITOR && "View/Download Approved"}
                                          </span>
                                      </div>
                                  </label>

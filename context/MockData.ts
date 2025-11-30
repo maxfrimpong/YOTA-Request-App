@@ -8,6 +8,7 @@ export const MOCK_USERS: User[] = [
   { id: 'u4', name: 'David Auth', email: 'david@org.com', password: 'password123', roles: [Role.AUTHORIZER], department: 'IT', position: 'Director' },
   { id: 'u5', name: 'Eve Exec', email: 'eve@org.com', password: 'password123', roles: [Role.APPROVER, Role.AUTHORIZER], department: 'Executive', position: 'Executive Director' },
   { id: 'u6', name: 'Frank Admin', email: 'admin@org.com', password: 'password123', roles: [Role.ADMIN], department: 'Admin' },
+  { id: 'u7', name: 'Grace Auditor', email: 'auditor@org.com', password: 'password123', roles: [Role.AUDITOR], department: 'Finance', position: 'Internal Auditor' },
 ];
 
 export const MOCK_REQUESTS: PaymentRequest[] = [
@@ -79,6 +80,7 @@ export const MOCK_REQUESTS: PaymentRequest[] = [
     withholdingTaxPercentage: 0,
     files: [],
     authorizerId: 'u3',
+    approverId: 'u5', // Approved by Eve
     status: RequestStatus.APPROVED,
     createdAt: new Date(Date.now() - 86400000 * 10).toISOString(),
     updatedAt: new Date(Date.now() - 86400000 * 8).toISOString(),

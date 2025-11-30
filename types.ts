@@ -3,7 +3,8 @@ export enum Role {
   ADMIN = 'ADMIN',
   STAFF = 'STAFF',
   AUTHORIZER = 'AUTHORIZER',
-  APPROVER = 'APPROVER' // Executive Director
+  APPROVER = 'APPROVER', // Executive Director
+  AUDITOR = 'AUDITOR' // External or Internal Auditor
 }
 
 export enum RequestStatus {
@@ -56,6 +57,7 @@ export interface PaymentRequest {
   withholdingTaxPercentage?: number; // New field for tax calculation
   files: RequestFile[];
   authorizerId: string;
+  approverId?: string; // ID of the Executive Director who approved it
   status: RequestStatus;
   createdAt: string;
   updatedAt: string;

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
@@ -7,6 +8,7 @@ import { StaffDashboard } from './pages/StaffDashboard';
 import { AuthorizerDashboard } from './pages/AuthorizerDashboard';
 import { ApproverDashboard } from './pages/ApproverDashboard';
 import { AdminDashboard } from './pages/AdminDashboard';
+import { AuditorDashboard } from './pages/AuditorDashboard';
 import { Profile } from './pages/Profile';
 import { Role } from './types';
 
@@ -24,6 +26,8 @@ const DashboardRouter = () => {
       return <ApproverDashboard />;
     case Role.ADMIN:
       return <AdminDashboard />;
+    case Role.AUDITOR:
+      return <AuditorDashboard />;
     default:
       return <div>Unknown Role</div>;
   }

@@ -175,6 +175,8 @@ export const AppProvider = ({ children }: { children?: ReactNode }) => {
         return {
           ...req,
           status,
+          // Capture the approver ID if this action approves the request
+          approverId: status === RequestStatus.APPROVED && user ? user.id : req.approverId,
           remarks: remarks || req.remarks,
           updatedAt: new Date().toISOString()
         };

@@ -142,7 +142,8 @@ export const Layout = ({ children }: { children?: React.ReactNode }) => {
                 {location.pathname === '/profile' ? 'User Profile' : 
                  activeRole === Role.ADMIN ? 'System Administration' : 
                  activeRole === Role.APPROVER ? 'Executive Portal' : 
-                 activeRole === Role.AUTHORIZER ? 'Authorizer Dashboard' : 'Staff Dashboard'}
+                 activeRole === Role.AUTHORIZER ? 'Authorizer Dashboard' : 
+                 activeRole === Role.AUDITOR ? 'Auditor Access Portal' : 'Staff Dashboard'}
               </h2>
               
               <div className="flex items-center space-x-6">
